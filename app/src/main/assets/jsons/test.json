@@ -1,0 +1,16 @@
+{
+  "version": 3,
+  "input": {
+    "address": "photo.pixtree.com",
+    "protocol": "sftp",
+    "port": 57556,
+    "file": "/input/test.png"
+  },
+  "output": {
+    "lossless": 0,
+    "compress": 7,
+    "protocol": "link",
+    "size": 1
+  },
+  "sr_mode": 5
+}
