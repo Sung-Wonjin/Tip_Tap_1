@@ -1,6 +1,9 @@
 package com.example.myapplication;
 
 import android.app.Activity;
+import android.database.Cursor;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.widget.TextView;
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -14,6 +17,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.net.Uri;
 import android.content.Intent;
+
+import java.io.InputStream;
+import java.util.Objects;
 /*import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     ImageView imageView;
     ImageView imageView1;
     Button button;
+
     private BackPressCloseHandler backPressCloseHandler;
     ImageActivity imageActivity;
     @Override
@@ -57,29 +64,11 @@ public class MainActivity extends AppCompatActivity {
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(intent, 1);
-                
-                intent2.putExtra("local_file",
-                private String getRealPathFromURI(Uri contentUri) {
-                    if (contentUri.getPath().startsWith("/storage"))
-                    {
-                        return contentUri.getPath();
-                    }
-                    String id = DocumentsContract.getDocumentId(contentUri).split(":")[1];
-                    String[] columns = { MediaStore.Files.FileColumns.DATA };
-                    String selection = MediaStore.Files.FileColumns._ID + " = " + id;
-                    Cursor cursor = getContentResolver().query(MediaStore.Files.getContentUri("external"), columns, selection, null, null);
-                    try {
-                        int columnIndex = cursor.getColumnIndex(columns[0]);
-                        if (cursor.moveToFirst()) { return cursor.getString(columnIndex); } 
-                    }
-                    finally 
-                    {
-                        cursor.close();
-                    }
-                    return null;
-                })
+
+
 
                 Intent intent2 = new Intent();
+                intent2.putExtra("local_file",intent.toUri(0));
 				intent.setAction(Intent.ACTION_PICK);
 				// FTP URL (Starts with ftp://, sftp://, scp:// or ftps:// followed by hostname and port).
 				Uri ftpUri = Uri.parse("sftp://photo.pixtree.com:57556");
@@ -109,15 +98,15 @@ public class MainActivity extends AppCompatActivity {
         imageView1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                
+
 
             }
         });
         Button uploadFilesButton = (Button) findViewById(R.id.button2);
         uploadFilesButton.setOnClickListener(new View.OnClickListener()
-        {
-			
-        });
+            {
+
+            });
     }
 
     @Override
@@ -134,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        imageView1 = (ImageView) findViewById(R.id.image1);
+        imageView1 = findViewById(R.id.image1);
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
                 try {
@@ -149,6 +138,29 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+        if(requestCode == 1 && resultCode == RESULT_OK) {
+            Uri fileUri = data.getData();
+        }
+    }
+
+    private String getRealPathFromURI(Uri contentUri) {
+        if (contentUri.getPath().startsWith("/storage"))
+        {
+            return contentUri.getPath();
+        }
+        String id = DocumentsContract.getDocumentId(contentUri).split(":")[1];
+        String[] columns = { MediaStore.Files.FileColumns.DATA };
+        String selection = MediaStore.Files.FileColumns._ID + " = " + id;
+        Cursor cursor = getContentResolver().query(MediaStore.Files.getContentUri("external"), columns, selection, null, null);
+        try {
+            int columnIndex = cursor.getColumnIndex(columns[0]);
+            if (cursor.moveToFirst()) { return cursor.getString(columnIndex); }
+        }
+        finally
+        {
+            cursor.close();
+        }
+        return null;
     }
 }
 
