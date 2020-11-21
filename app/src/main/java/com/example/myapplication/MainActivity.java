@@ -57,8 +57,28 @@ public class MainActivity extends AppCompatActivity {
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(intent, 1);
+                
+                intent2.putExtra("local_file",
+                private String getRealPathFromURI(Uri contentUri) {
+                    if (contentUri.getPath().startsWith("/storage"))
+                    {
+                        return contentUri.getPath();
+                    }
+                    String id = DocumentsContract.getDocumentId(contentUri).split(":")[1];
+                    String[] columns = { MediaStore.Files.FileColumns.DATA };
+                    String selection = MediaStore.Files.FileColumns._ID + " = " + id;
+                    Cursor cursor = getContentResolver().query(MediaStore.Files.getContentUri("external"), columns, selection, null, null);
+                    try {
+                        int columnIndex = cursor.getColumnIndex(columns[0]);
+                        if (cursor.moveToFirst()) { return cursor.getString(columnIndex); } 
+                    }
+                    finally 
+                    {
+                        cursor.close();
+                    }
+                    return null;
+                })
 
-                intent2.putExtra("local_file",intent.getPath());
                 Intent intent2 = new Intent();
 				intent.setAction(Intent.ACTION_PICK);
 				// FTP URL (Starts with ftp://, sftp://, scp:// or ftps:// followed by hostname and port).
