@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(intent, 1);
+
                 intent2.putExtra("local_file",intent.getPath());
                 Intent intent2 = new Intent();
 				intent.setAction(Intent.ACTION_PICK);
