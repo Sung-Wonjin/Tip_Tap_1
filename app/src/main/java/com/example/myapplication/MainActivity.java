@@ -99,6 +99,8 @@ public class MainActivity extends AppCompatActivity {
         imageView1 = findViewById(R.id.image1);
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
+                Uri fileUri = data.getData();
+                String contentUri = getRealPathFromURI(fileUri);
                 try {
                     InputStream in = getContentResolver().openInputStream(Objects.requireNonNull(data.getData()));
                     Bitmap img = BitmapFactory.decodeStream(in);
@@ -110,9 +112,6 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
-        }
-        if(requestCode == 1 && resultCode == RESULT_OK) {
-            Uri fileUri = data.getData();
         }
     }
 
