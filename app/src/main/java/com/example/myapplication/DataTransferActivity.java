@@ -9,9 +9,9 @@ import android.view.View;
 import android.widget.Button;
 
 
-public class TransferActivity extends Activity 
+public class DataTransferActivity extends Activity
 {
-	private static final String TAG = TransferActivity.class.getName();
+	private static final String TAG = DataTransferActivity.class.getName();
 	private static final int UPLOAD_FILES_REQUEST = 0;
 	private static final int DOWNLOAD_FILES_REQUEST = 1;
 	private static final int UPLOAD_FOLDER_REQUEST = 2;
