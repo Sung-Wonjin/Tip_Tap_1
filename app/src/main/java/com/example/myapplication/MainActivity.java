@@ -50,73 +50,11 @@ public class MainActivity extends AppCompatActivity {
         backPressCloseHandler = new BackPressCloseHandler(this);
 
         button = (Button) findViewById(R.id.button);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(intent, 1);
-                
-                intent2.putExtra("local_file",
-                private String getRealPathFromURI(Uri contentUri) {
-                    if (contentUri.getPath().startsWith("/storage"))
-                    {
-                        return contentUri.getPath();
-                    }
-                    String id = DocumentsContract.getDocumentId(contentUri).split(":")[1];
-                    String[] columns = { MediaStore.Files.FileColumns.DATA };
-                    String selection = MediaStore.Files.FileColumns._ID + " = " + id;
-                    Cursor cursor = getContentResolver().query(MediaStore.Files.getContentUri("external"), columns, selection, null, null);
-                    try {
-                        int columnIndex = cursor.getColumnIndex(columns[0]);
-                        if (cursor.moveToFirst()) { return cursor.getString(columnIndex); } 
-                    }
-                    finally 
-                    {
-                        cursor.close();
-                    }
-                    return null;
-                })
-
-                Intent intent2 = new Intent();
-				intent.setAction(Intent.ACTION_PICK);
-				// FTP URL (Starts with ftp://, sftp://, scp:// or ftps:// followed by hostname and port).
-				Uri ftpUri = Uri.parse("sftp://photo.pixtree.com:57556");
-				intent2.setDataAndType(ftpUri, "vnd.android.cursor.dir/vnd.pixtree.uri");
-				// Upload
-				intent2.putExtra("command_type", "upload");
-				// FTP credentials (optional)
-				intent2.putExtra("ftp_username", "snova");
-				intent2.putExtra("ftp_password", "^Snova");
-				//intent.putExtra("ftp_keyfile", "/sdcard/rsakey.txt");
-				//intent.putExtra("ftp_keypass", "optionalkeypassword");
-				// FTP settings (optional)
-				intent2.putExtra("ftp_pasv", "true");
-				//intent.putExtra("ftp_resume", "true");
-				//intent.putExtra("ftp_encoding", "UTF-8");
-				//intent.putExtra("ftps_mode", "implicit");
-				// Activity title
-				intent2.putExtra("progress_title", "Uploading files ...");
-				intent2.putExtra("local_file1", "/sdcard/subfolder1/file1.zip");
-				//intent.putExtra("local_file2", "/sdcard/subfolder2/file2.zip");
-				// Optional initial remote folder (it must exist before upload)
-				//intent.putExtra("remote_folder", "/remotefolder/subfolder");
-				//intent.putExtra("close_ui", "true");
-				startActivityForResult(intent2, UPLOAD_FILES_REQUEST);
-            }
-        });
+      
         imageView1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                
-
             }
-        });
-        Button uploadFilesButton = (Button) findViewById(R.id.button2);
-        uploadFilesButton.setOnClickListener(new View.OnClickListener()
-        {
-			
         });
     }
 
