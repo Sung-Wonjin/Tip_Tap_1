@@ -27,7 +27,6 @@ public class IntroThread extends Thread {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
 }
