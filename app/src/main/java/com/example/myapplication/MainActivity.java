@@ -64,14 +64,17 @@ public class MainActivity extends AppCompatActivity {
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(intent, 1);
-            }
-        });
-        imageView1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
 
             }
-        });
+        });//listener of the butten for the image call
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent3 = new Intent(getApplicationContext(),MainActivity.class);
+                intent3.getExta();
+                imageActivity.startActivity(intent3);
+            }
+        });//listener when the user touched the image. when the user click the image, android shows the whole image that can zoom in or zoom out.
         button = (Button) findViewById(R.id.button2);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
