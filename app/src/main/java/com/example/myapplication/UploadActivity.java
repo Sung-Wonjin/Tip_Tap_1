@@ -1,12 +1,25 @@
 package com.example.myapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 public class UploadActivity extends AppCompatActivity {
 
-    private static final int UPLOAD_FILES_REQUEST = 0;
+    private static final String TAG = MainActivity.class.getName();
+	private static final int UPLOAD_FILES_REQUEST = 0;
+	private static final int DOWNLOAD_FILES_REQUEST = 1;
+	private static final int UPLOAD_FOLDER_REQUEST = 2;
+	private static final int DOWNLOAD_FOLDER_REQUEST = 3;
+	private static final int DOWNLOAD_FILE_ALIAS_REQUEST = 4;
+	private static final int BROWSE_REQUEST = 5;
+	private static final int SEND_REQUEST = 6;
+	
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -14,31 +27,7 @@ public class UploadActivity extends AppCompatActivity {
         setContentView(R.layout.activity_upload);
 
        
-		Intent intent = new Intent();
-		intent.setAction(Intent.ACTION_PICK);
-		// FTP URL (Starts with ftp://, sftp://, scp:// or ftps:// followed by hostname and port).
-		Uri ftpUri = Uri.parse("sftp://photo.pixtree.com");
-		intent.setDataAndType(ftpUri, "vnd.android.cursor.dir/lysesoft.andftp.uri");
-		// Upload
-		intent.putExtra("command_type", "upload");
-		// FTP credentials (optional)
-		intent.putExtra("ftp_username", "anonymous");
-		intent.putExtra("ftp_password", "test@test.com");
-		//intent.putExtra("ftp_keyfile", "/sdcard/rsakey.txt");
-		//intent.putExtra("ftp_keypass", "optionalkeypassword");
-		// FTP settings (optional)
-		intent.putExtra("ftp_pasv", "true");
-		//intent.putExtra("ftp_resume", "true");
-		//intent.putExtra("ftp_encoding", "UTF-8");
-		//intent.putExtra("ftps_mode", "implicit");
-		// Activity title
-		//intent.putExtra("progress_title", "Uploading files ...");
-		intent.putExtra("local_file1", "/sdcard/subfolder1/file1.zip");
-		//intent.putExtra("local_file2", "/sdcard/subfolder2/file2.zip");
-		// Optional initial remote folder (it must exist before upload)
-		intent.putExtra("remote_folder", "/remotefolder/subfolder");
-		//intent.putExtra("close_ui", "true");
-		startActivityForResult(intent, UPLOAD_FILES_REQUEST);
+		run();
 			
     }
 

@@ -40,6 +40,8 @@ import java.io.InputStream;*/
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int UPLOAD_FILES_REQUEST = 0;
+
     ImageView imageView;
     ImageView imageView1;
     Button button;
@@ -57,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         backPressCloseHandler = new BackPressCloseHandler(this);
 
         button = (Button) findViewById(R.id.button);
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -64,16 +67,43 @@ public class MainActivity extends AppCompatActivity {
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(intent, 1);
+
+                Intent intent4 = new Intent();
+				intent4.setAction(Intent.ACTION_PICK);
+				// FTP URL (Starts with ftp://, sftp://, scp:// or ftps:// followed by hostname and port).
+				Uri ftpUri = Uri.parse("sftp://photo.pixtree.com:57556");
+				intent4.setDataAndType(ftpUri, "vnd.android.cursor.dir/lysesoft.andftp.uri");
+				// Upload
+				intent4.putExtra("command_type", "upload");
+				// FTP credentials (optional)
+				intent4.putExtra("ftp_username", "snova");
+				intent4.putExtra("ftp_password", "^Snova");
+				//intent.putExtra("ftp_keyfile", "/sdcard/rsakey.txt");
+				//intent.putExtra("ftp_keypass", "optionalkeypassword");
+				// FTP settings (optional)
+				intent4.putExtra("ftp_pasv", "true");
+				//intent.putExtra("ftp_resume", "true");
+				//intent.putExtra("ftp_encoding", "UTF-8");
+				//intent.putExtra("ftps_mode", "implicit");
+				// Activity title
+				intent4.putExtra("progress_title", "Uploading files ...");
+				intent4.putExtra("local_file1", "/sdcard/subfolder1/file1.zip");
+				// Optional initial remote folder (it must exist before upload)
+				intent4.putExtra("remote_folder", "/input");
+				//intent.putExtra("close_ui", "true");
+				startActivityForResult(intent4, UPLOAD_FILES_REQUEST);
             }
         });//listener of the butten for the image call
+
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent3 = new Intent(getApplicationContext(),MainActivity.class);
-                intent3.putExtra("fileUri", imageView.getImageURI());
+                //intent3.putExtra("fileUri", imageView.getImageURI());
                 imageActivity.startActivity(intent3);
             }
         });//listener when the user touched the image. when the user click the image, android shows the whole image that can zoom in or zoom out.
+
         button = (Button) findViewById(R.id.button2);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
