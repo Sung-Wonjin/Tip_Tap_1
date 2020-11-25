@@ -68,6 +68,23 @@ public class MainActivity extends AppCompatActivity {
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(intent, 1);
 
+            }
+        });//listener of the butten for the image call
+
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent3 = new Intent(getApplicationContext(),MainActivity.class);
+                //intent3.putExtra("fileUri", imageView.getImageURI());
+                imageActivity.startActivity(intent3);
+            }
+        });//listener when the user touched the image. when the user click the image, android shows the whole image that can zoom in or zoom out.
+
+        button = (Button) findViewById(R.id.button2);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
                 Intent intent4 = new Intent();
 				intent4.setAction(Intent.ACTION_PICK);
 				// FTP URL (Starts with ftp://, sftp://, scp:// or ftps:// followed by hostname and port).
@@ -93,24 +110,6 @@ public class MainActivity extends AppCompatActivity {
 				//intent.putExtra("close_ui", "true");
 				startActivityForResult(intent4, UPLOAD_FILES_REQUEST);
             }
-        });//listener of the butten for the image call
-
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent3 = new Intent(getApplicationContext(),MainActivity.class);
-                //intent3.putExtra("fileUri", imageView.getImageURI());
-                imageActivity.startActivity(intent3);
-            }
-        });//listener when the user touched the image. when the user click the image, android shows the whole image that can zoom in or zoom out.
-
-        button = (Button) findViewById(R.id.button2);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent1 = new Intent();
-                intent1.setType("image/*");
-            }
         });
     }
 
@@ -129,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         imageView1 = findViewById(R.id.image1);
+        
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
                 
@@ -148,7 +148,35 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-
+        Log.i(TAG, "Result: "+resultCode+ " from request: "+requestCode);
+        if(requestCode == 0)
+        {
+            if (intent != null)
+	    	{
+	    		String transferredBytesStr = intent.getStringExtra("TRANSFERSIZE");
+	    		String transferTimeStr = intent.getStringExtra("TRANSFERTIME");
+	    		Log.i(TAG, "Transfer status: " + intent.getStringExtra("TRANSFERSTATUS"));
+	    		Log.i(TAG, "Transfer amount: " + intent.getStringExtra("TRANSFERAMOUNT") + " file(s)");
+	    		Log.i(TAG, "Transfer size: " + transferredBytesStr + " bytes");
+	    		Log.i(TAG, "Transfer time: " + transferTimeStr + " milliseconds");
+	    		// Compute transfer rate.
+	    		if ((transferredBytesStr != null) && (transferTimeStr != null))
+	    		{
+	    			try
+	    			{
+	    				long transferredBytes = Long.parseLong(transferredBytesStr);
+	    				long transferTime = Long.parseLong(transferTimeStr);
+	    				double transferRate = 0.0;
+	    				if (transferTime > 0) transferRate = ((transferredBytes) * 1000.0) / (transferTime * 1024.0);
+	    				Log.i(TAG, "Transfer rate: " + transferRate + " KB/s");
+	    			} 
+	    			catch (NumberFormatException e)
+	    			{
+	    				// Cannot parse string.
+	    			}
+	    		}
+            }
+        }
     }
 
     private String getRealPathFromURI(Uri contentUri) {
