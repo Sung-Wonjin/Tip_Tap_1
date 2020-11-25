@@ -40,6 +40,7 @@ import java.io.InputStream;*/
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = MainActivity.class.getName();
     private static final int UPLOAD_FILES_REQUEST = 0;
 
     ImageView imageView;
