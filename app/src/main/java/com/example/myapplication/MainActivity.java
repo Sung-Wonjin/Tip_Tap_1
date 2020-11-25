@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
         imageView = (ImageView) findViewById(R.id.image);
         imageView1 = (ImageView) findViewById(R.id.image1);
-        String FileUri;
+        final String FileUri;
         backPressCloseHandler = new BackPressCloseHandler(this);
 
         button = (Button) findViewById(R.id.button);
@@ -64,14 +64,13 @@ public class MainActivity extends AppCompatActivity {
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(intent, 1);
-                FileUri = getExtraData("fileuri")
             }
         });//listener of the butten for the image call
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent3 = new Intent(getApplicationContext(),MainActivity.class);
-                intent3.getStringExtra();
+                intent3.putExtra("fileUri", imageView.getImageURI());
                 imageActivity.startActivity(intent3);
             }
         });//listener when the user touched the image. when the user click the image, android shows the whole image that can zoom in or zoom out.
@@ -102,21 +101,24 @@ public class MainActivity extends AppCompatActivity {
         imageView1 = findViewById(R.id.image1);
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
-                Uri fileUri = data.getData();
-                String contentUri = getRealPathFromURI(fileUri);
-                data.putExtra("fileuri",contentUri);
+                
                 try {
                     InputStream in = getContentResolver().openInputStream(Objects.requireNonNull(data.getData()));
                     Bitmap img = BitmapFactory.decodeStream(in);
                     if (in != null) {
                         in.close();
                     }
+                    Uri fileUri = data.getData();
+                    String contentUri = getRealPathFromURI(fileUri);
+                    data.putExtra("fileuri",contentUri);
+                    imageView.setImageURI(fileUri);
                     imageView.setImageBitmap(img);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }
+
     }
 
     private String getRealPathFromURI(Uri contentUri) {
