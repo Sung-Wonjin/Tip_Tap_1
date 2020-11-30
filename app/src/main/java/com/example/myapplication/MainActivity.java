@@ -2,6 +2,7 @@ package com.example.myapplication;
 
 import android.app.Activity;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.widget.TextView;
@@ -17,9 +18,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.net.Uri;
 import android.content.Intent;
+import android.widget.Toast;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Objects;
+
+import javax.net.ssl.HttpsURLConnection;
 /*import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     ImageView imageView;
     ImageView imageView1;
     Button button;
+    Button button2;
 
     private BackPressCloseHandler backPressCloseHandler;
     ImageActivity imageActivity;
@@ -57,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
         imageView1 = (ImageView) findViewById(R.id.image1);
         final String FileUri;
         backPressCloseHandler = new BackPressCloseHandler(this);
-
         button = (Button) findViewById(R.id.button);
 
         button.setOnClickListener(new View.OnClickListener() {
@@ -71,29 +79,42 @@ public class MainActivity extends AppCompatActivity {
             }
         });//listener of the butten for the image call
 
-        imageView.setOnClickListener(new View.OnClickListener() {
+        /*imageView.setOnClickListener(new View.OnClickListener() {
+
+        });//listener when the user touched the image. when the user click the image, android shows the whole image that can zoom in or zoom out.*/
+
+        button2 = (Button) findViewById(R.id.button2);
+        button2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AsyncTask.execute(new Runnable(){
+                AsyncTask.execute(new Runnable() {
                     @Override
-                    public void run(){
-                        URL url = new URL("https://photo.pixtree.com:34569/sr/start/");
-                        HttpsURLConnection Connection = (HttpsURLConnection) url.openConnection();
-                        Connection.setRequestProperty("User-Agent", "my-rest-app-v0.1");
-                        if (Connection.getResponseCode() == 200) {
-                            Toast.makeText(getApplicationContext(), "Connection seccess", Toast.LENGTH_LONG).show());
-                        } else {
-                            Toast.makeText(getApplicationContext(), "Connection error", Toast.LENGTH_LONG).show();
-                            // Error handling code goes here
+                    public void run() {
+                        URL url = null;
+                        try {
+                            url = new URL("https://photo.pixtree.com:34569/sr/start/");
+                        } catch (MalformedURLException e) {
+                            e.printStackTrace();
+                        }
+                        HttpsURLConnection connection = null;
+                        try {
+                            connection = (HttpsURLConnection) url.openConnection();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        connection.setRequestProperty("User-Agent", "my-rest-app-v0.1");
+                        try {
+                            if (connection.getResponseCode() == 200) {
+                                Toast.makeText(getApplicationContext(), "Connection seccess", Toast.LENGTH_LONG).show();
+                            } else {
+                                Toast.makeText(getApplicationContext(), "Connection error", Toast.LENGTH_LONG).show();
+                                // Error handling code goes here
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
                     }
-                })
-            }
-        });//listener when the user touched the image. when the user click the image, android shows the whole image that can zoom in or zoom out.
-
-        button = (Button) findViewById(R.id.button2);
-        button.setOnClickListener(new View.OnClickListener() {
-           
+                });
             }
         });
     }
@@ -132,7 +153,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-        Log.i(TAG, "Result: "+resultCode+ " from request: "+requestCode);
         if(requestCode == 0)
         {
             
