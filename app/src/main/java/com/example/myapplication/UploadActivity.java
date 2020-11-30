@@ -26,8 +26,6 @@ public class UploadActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload);
 
-
-			
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) 
