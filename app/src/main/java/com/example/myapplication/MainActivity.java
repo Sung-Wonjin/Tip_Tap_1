@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
                 //Glide.with(MainActivity.this).load(url).into(imageView1);
                 Toast.makeText(MainActivity.this,"butten2 pressed",Toast.LENGTH_SHORT).show();
             }
-            
+
         });
     }
 
