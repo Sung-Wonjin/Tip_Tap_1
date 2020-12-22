@@ -56,6 +56,14 @@
         android:text="Save Image"
         android:textSize="11dp" />
 
+    <TextView
+        android:id="@+id/textview1"
+        android:layout_width="350dp"
+        android:layout_height="150dp"
+        android:layout_below="@+id/button3"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="30dp"
+        />
 </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,7 +1,9 @@
 package com.example.myapplication;
 
 import android.app.Activity;
+import android.content.Context;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
@@ -15,11 +17,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import androidx.appcompat.app.AppCompatActivity;
-import android.util.Log;
 import android.net.Uri;
 import android.content.Intent;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.ViewTarget;
+
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -54,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     Button button;
     Button button2;
 
+
     private BackPressCloseHandler backPressCloseHandler;
     ImageActivity imageActivity;
     
@@ -64,9 +70,11 @@ public class MainActivity extends AppCompatActivity {
 
         imageView = (ImageView) findViewById(R.id.image);
         imageView1 = (ImageView) findViewById(R.id.image1);
+
         final String FileUri;
         backPressCloseHandler = new BackPressCloseHandler(this);
         button = (Button) findViewById(R.id.button);
+        button2 = (Button) findViewById(R.id.button2);
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,50 +88,48 @@ public class MainActivity extends AppCompatActivity {
         });//listener of the butten for the image call
 
         /*imageView.setOnClickListener(new View.OnClickListener() {
-
         });//listener when the user touched the image. when the user click the image, android shows the whole image that can zoom in or zoom out.*/
 
-        button2 = (Button) findViewById(R.id.button2);
         button2.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                AsyncTask.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        URL url = null;
-                        try {
-                            url = new URL("https://photo.pixtree.com:34569/sr/start/");
-                        } catch (MalformedURLException e) {
-                            e.printStackTrace();
-                        }
-                        HttpsURLConnection connection = null;
-                        try {
-                            connection = (HttpsURLConnection) url.openConnection();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        connection.setRequestProperty("User-Agent", "my-rest-app-v0.1");
-                        try {
-                            if (connection.getResponseCode() == 200) {
-                                Toast.makeText(getApplicationContext(), "Connection seccess", Toast.LENGTH_LONG).show();
-                            } else {
-                                Toast.makeText(getApplicationContext(), "Connection error", Toast.LENGTH_LONG).show();
-                                // Error handling code goes here
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
+            public void onClick(View v) {
+                imageView1 = (ImageView) findViewById(R.id.image1);
+                Bitmap imgBitmap = GetImageFromURL("http://photo.pixtree.com:44569/236F2C1E-42FD-11EB-9055-002590D363D8.JPG");
+                imageView1.setImageBitmap(imgBitmap);
+                //Glide.with(MainActivity.this).load(url).into(imageView1);
+                Toast.makeText(MainActivity.this,"butten2 pressed",Toast.LENGTH_SHORT).show();
             }
+            
         });
     }
+
+    private Bitmap GetImageFromURL(String strImageURL)
+    {
+        Bitmap imgBitmap = null;
+        try
+        {
+            URL url = new URL(strImageURL);
+            URLConnection conn = url.openConnection();
+            conn.connect();
+            int nSize = conn.getContentLength();
+            BufferedInputStream bis = new BufferedInputStream(conn.getInputStream(), nSize);
+            imgBitmap = BitmapFactory.decodeStream(bis);
+
+            bis.close();
+        }
+            catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return imgBitmap;
+    }
+
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         backPressCloseHandler.onBackPressed();
-        }
+    }
 
     @Override
     public void onPause() {
