@@ -3,10 +3,12 @@ package com.example.myapplication;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.widget.TextView;
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -25,25 +27,25 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.ViewTarget;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Objects;
-
+import com.bumptech.glide.Glide;
+import java.util.Base64.Encoder;
 import javax.net.ssl.HttpsURLConnection;
 /*import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import com.bumptech.glide.Glide;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.InputStream;
 import java.util.Objects;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -70,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
         imageView = (ImageView) findViewById(R.id.image);
         imageView1 = (ImageView) findViewById(R.id.image1);
-
+        final TextView textview1 = (TextView) findViewById(R.id.textview1);
         final String FileUri;
         backPressCloseHandler = new BackPressCloseHandler(this);
         button = (Button) findViewById(R.id.button);
@@ -94,9 +96,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 imageView1 = (ImageView) findViewById(R.id.image1);
-                Bitmap imgBitmap = GetImageFromURL("http://photo.pixtree.com:44569/236F2C1E-42FD-11EB-9055-002590D363D8.JPG");
-                imageView1.setImageBitmap(imgBitmap);
-                //Glide.with(MainActivity.this).load(url).into(imageView1);
+                BitmapDrawable drawable = (BitmapDrawable) imageView.getDrawable();
+                Bitmap bmap = drawable.getBitmap();
+                String imagestring = getBase64String(bmap);
+
+                byte[] decodedByteArray = Base64.decode(imagestring, Base64.NO_WRAP);
+                Bitmap decodedBitmap = BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.length);
+                imageView1.setImageBitmap(decodedBitmap);
+                //the code that makes json file to call rest api and parse response json shuld be in here
                 Toast.makeText(MainActivity.this,"butten2 pressed",Toast.LENGTH_SHORT).show();
             }
 
@@ -136,10 +143,20 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
     }
 
+    public String getBase64String(Bitmap bitmap)
+    {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+
+        byte[] imageBytes = byteArrayOutputStream.toByteArray();
+
+        return Base64.encodeToString(imageBytes, Base64.NO_WRAP);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        imageView1 = findViewById(R.id.image1);
         
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
@@ -150,9 +167,6 @@ public class MainActivity extends AppCompatActivity {
                     if (in != null) {
                         in.close();
                     }
-                    Uri fileUri = data.getData();
-                    String contentUri = getRealPathFromURI(fileUri);
-                    data.putExtra("fileuri",contentUri);
                     imageView.setImageBitmap(img);
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -63,6 +63,10 @@
         android:layout_below="@+id/button3"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="30dp"
+        android:text="textview"
+        android:maxLines="5"
+        android:ellipsize="end"
+        android:textSize="10dp"
         />
 </RelativeLayout>
 
