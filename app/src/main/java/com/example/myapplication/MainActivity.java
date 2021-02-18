@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
         RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
                 .addFormDataPart("", "config_json.json",
                         RequestBody.create(MediaType.parse("application/octet-stream"),
-                                new File("/C:/Users/SUNG/Documents/카카오톡 받은 파일/config_json.json")))
+                                new File("src/main/assets/config_json.json")))
                 .addFormDataPart("", "pixtretemp.jpg",
                         RequestBody.create(MediaType.parse("application/octet-stream"),
                                 new File("/data/data/com.example.myapplication/chche/pixtretemp.jpg")))
