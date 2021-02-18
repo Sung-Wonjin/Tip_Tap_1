@@ -3,8 +3,7 @@
   "input": {
     "address": "photo.pixtree.com",
     "protocol": "sftp",
-    "port": 57556,
-    "file": "/input/test.png"
+    "port": 57556
   },
   "output": {
     "lossless": 0,

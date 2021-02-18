@@ -1,0 +1,13 @@
+{
+    "version": 4,
+    "input": {
+        "protocol": "internal"
+    },
+    "output": {
+        "lossless": 0,
+        "compress": 7,
+        "protocol": "link",
+        "size": 1
+    },
+    "sr_mode": 5
+}

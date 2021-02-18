@@ -1,14 +1,17 @@
 package com.example.myapplication;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.util.Base64;
+import android.util.Log;
 import android.widget.TextView;
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -28,6 +31,9 @@ import com.bumptech.glide.request.target.ViewTarget;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -37,20 +43,13 @@ import java.util.Objects;
 import com.bumptech.glide.Glide;
 import java.util.Base64.Encoder;
 import javax.net.ssl.HttpsURLConnection;
-/*import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.InputStream;
-import java.util.Objects;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;*/
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -70,14 +69,23 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        imageView = (ImageView) findViewById(R.id.image);
+        MyAsyncTask mProcessTask = null;
+        try {
+            mProcessTask = new MyAsyncTask();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        mProcessTask.execute();
+
+
+            imageView = (ImageView) findViewById(R.id.image);
         imageView1 = (ImageView) findViewById(R.id.image1);
         final TextView textview1 = (TextView) findViewById(R.id.textview1);
         final String FileUri;
         backPressCloseHandler = new BackPressCloseHandler(this);
         button = (Button) findViewById(R.id.button);
         button2 = (Button) findViewById(R.id.button2);
-
+        String name = "pixtretemp";
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -86,6 +94,9 @@ public class MainActivity extends AppCompatActivity {
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(intent, 1);
 
+                BitmapDrawable drawable = (BitmapDrawable) imageView.getDrawable();
+                Bitmap bmap = drawable.getBitmap();
+                saveBitmaptoJpeg(bmap,"pixtretemp");
             }
         });//listener of the butten for the image call
 
@@ -110,6 +121,54 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public class MyAsyncTask extends AsyncTask<String, Void, String> {
+
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .build();
+        MediaType mediaType = MediaType.parse("text/plain");
+        RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                .addFormDataPart("", "config_json.json",
+                        RequestBody.create(MediaType.parse("application/octet-stream"),
+                                new File("/C:/Users/SUNG/Documents/카카오톡 받은 파일/config_json.json")))
+                .addFormDataPart("", "pixtretemp.jpg",
+                        RequestBody.create(MediaType.parse("application/octet-stream"),
+                                new File("/data/data/com.example.myapplication/chche/pixtretemp.jpg")))
+                .build();
+        Request request = new Request.Builder()
+                .url("http://photo.pixtree.com:34569/sr/start/")
+                .method("POST", body)
+                .addHeader("Authorization", "Bearer supernova")
+                .build();
+        Response response = client.newCall(request).execute();
+
+        public MyAsyncTask() throws IOException {
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            return null;
+        }
+    }
+
+    public void saveBitmaptoJpeg(Bitmap bitmap, String name)
+    {
+        File storage = getCacheDir();
+        String fileName = name+".jpg";
+        File tempfile = new File(storage,fileName);
+
+        try{
+            tempfile.createNewFile();
+            FileOutputStream out = new FileOutputStream(tempfile);
+            bitmap.compress(Bitmap.CompressFormat.JPEG,100,out);
+            out.close();
+        }
+        catch (FileNotFoundException e) {
+            Log.e("MyTag","FileNotFoundException : " + e.getMessage());
+        } catch (IOException e) {
+            Log.e("MyTag","IOException : " + e.getMessage());
+        }
+    }
+
     private Bitmap GetImageFromURL(String strImageURL)
     {
         Bitmap imgBitmap = null;
@@ -131,6 +190,25 @@ public class MainActivity extends AppCompatActivity {
         return imgBitmap;
     }
 
+    private void httpconnection() throws IOException {
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .build();
+        MediaType mediaType = MediaType.parse("text/plain");
+        RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                .addFormDataPart("", "/C:/Users/SUNG/Documents/카카오톡 받은 파일/config_json.json",
+                        RequestBody.create(MediaType.parse("application/octet-stream"),
+                                new File("/C:/Users/SUNG/Documents/카카오톡 받은 파일/config_json.json")))
+                .addFormDataPart("", "/C:/Users/SUNG/Documents/카카오톡 받은 파일/sample.jpg",
+                        RequestBody.create(MediaType.parse("application/octet-stream"),
+                                new File("/C:/Users/SUNG/Documents/카카오톡 받은 파일/sample.jpg")))
+                .build();
+        Request request = new Request.Builder()
+                .url("http://photo.pixtree.com:34569/sr/start/")
+                .method("POST", body)
+                .addHeader("Authorization", "Bearer supernova")
+                .build();
+        Response response = client.newCall(request).execute();
+    }
 
     @Override
     public void onBackPressed() {
@@ -160,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
         
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
-                
+
                 try {
                     InputStream in = getContentResolver().openInputStream(Objects.requireNonNull(data.getData()));
                     Bitmap img = BitmapFactory.decodeStream(in);
