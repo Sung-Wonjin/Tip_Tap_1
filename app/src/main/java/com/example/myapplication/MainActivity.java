@@ -60,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
     Button button;
     Button button2;
 
-
     private BackPressCloseHandler backPressCloseHandler;
     ImageActivity imageActivity;
     
@@ -107,11 +106,14 @@ public class MainActivity extends AppCompatActivity {
                 imageView1 = (ImageView) findViewById(R.id.image1);
                 BitmapDrawable drawable = (BitmapDrawable) imageView.getDrawable();
                 Bitmap bmap = drawable.getBitmap();
-                String imagestring = getBase64String(bmap);
+                saveBitmaptoJpeg(bmap,"pixtretemp");
 
+
+                /*String imagestring = getBase64String(bmap);
                 byte[] decodedByteArray = Base64.decode(imagestring, Base64.NO_WRAP);
                 Bitmap decodedBitmap = BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.length);
-                imageView1.setImageBitmap(decodedBitmap);
+                imageView1.setImageBitmap(decodedBitmap);*/
+                //get image from imageview and incode the image to BASE64 stream. and then decode the image to bitmap.
                 //the code that makes json file to call rest api and parse response json shuld be in here
                 Toast.makeText(MainActivity.this,"butten2 pressed",Toast.LENGTH_SHORT).show();
             }
@@ -130,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
                                 new File("src/main/assets/config_json.json")))
                 .addFormDataPart("", "pixtretemp.jpg",
                         RequestBody.create(MediaType.parse("application/octet-stream"),
-                                new File("/data/data/com.example.myapplication/chche/pixtretemp.jpg")))
+                                new File(getCacheDir().getName())))
                 .build();
         Request request = new Request.Builder()
                 .url("http://photo.pixtree.com:34569/sr/start/")
@@ -150,12 +152,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void saveBitmaptoJpeg(Bitmap bitmap, String name)
     {
-        File storage = getCacheDir();
-        String fileName = name+".jpg";
-        File tempfile = new File(storage,fileName);
+        File tempfile = new File(getCacheDir(),name+".jpg");
 
         try{
-            tempfile.createNewFile();
             FileOutputStream out = new FileOutputStream(tempfile);
             bitmap.compress(Bitmap.CompressFormat.JPEG,100,out);
             out.close();
@@ -222,11 +221,8 @@ public class MainActivity extends AppCompatActivity {
     public String getBase64String(Bitmap bitmap)
     {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-
         byte[] imageBytes = byteArrayOutputStream.toByteArray();
-
         return Base64.encodeToString(imageBytes, Base64.NO_WRAP);
     }
 
