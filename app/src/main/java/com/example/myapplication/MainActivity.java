@@ -69,13 +69,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        MyAsyncTask mProcessTask = null;
+        /*MyAsyncTask mProcessTask = null;
         try {
             mProcessTask = new MyAsyncTask();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        mProcessTask.execute();
+        mProcessTask.execute();*/
 
 
             imageView = (ImageView) findViewById(R.id.image);
@@ -94,9 +94,7 @@ public class MainActivity extends AppCompatActivity {
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(intent, 1);
 
-                BitmapDrawable drawable = (BitmapDrawable) imageView.getDrawable();
-                Bitmap bmap = drawable.getBitmap();
-                saveBitmaptoJpeg(bmap,"pixtretemp");
+
             }
         });//listener of the butten for the image call
 
@@ -246,6 +244,7 @@ public class MainActivity extends AppCompatActivity {
                         in.close();
                     }
                     imageView.setImageBitmap(img);
+                    saveBitmaptoJpeg(img,"pixtretemp");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
