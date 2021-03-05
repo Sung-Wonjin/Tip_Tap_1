@@ -3,6 +3,7 @@ package com.example.myapplication;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -39,9 +40,12 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Objects;
 import com.bumptech.glide.Glide;
 import java.util.Base64.Encoder;
+import java.util.Random;
+
 import javax.net.ssl.HttpsURLConnection;
 
 import okhttp3.MediaType;
@@ -77,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         mProcessTask.execute();*/
 
 
-            imageView = (ImageView) findViewById(R.id.image);
+        imageView = (ImageView) findViewById(R.id.image);
         imageView1 = (ImageView) findViewById(R.id.image1);
         final TextView textview1 = (TextView) findViewById(R.id.textview1);
         final String FileUri;
@@ -104,10 +108,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 imageView1 = (ImageView) findViewById(R.id.image1);
-                BitmapDrawable drawable = (BitmapDrawable) imageView.getDrawable();
-                Bitmap bmap = drawable.getBitmap();
-                saveBitmaptoJpeg(bmap,"pixtretemp");
+                Bitmap bitmap = getBitmapFromCacheDir("pixtreetemp");
+                imageView1.setImageBitmap(bitmap);
 
+
+                //BitmapDrawable drawable = (BitmapDrawable) imageView.getDrawable();
+                //Bitmap bmap = drawable.getBitmap();
+                //saveBitmaptoJpeg(bmap,"pixtretemp");
 
                 /*String imagestring = getBase64String(bmap);
                 byte[] decodedByteArray = Base64.decode(imagestring, Base64.NO_WRAP);
@@ -121,6 +128,42 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private Bitmap getBitmapFromCacheDir(String name) {
+
+        ArrayList<String> arrays = new ArrayList<>();
+
+        File file = new File(getCacheDir().toString());
+        File[] files = file.listFiles();
+        for(File tempFile : files) {
+            Log.d("MyTag",tempFile.getName());
+            if(tempFile.getName().contains(name)) {
+                arrays.add(tempFile.getName());
+            }
+        }
+        if(arrays.size() > 0) {
+            int randomPosition = new Random().nextInt(arrays.size());
+            String path = getCacheDir() + "/" + arrays.get(randomPosition);
+            Bitmap bitmap = BitmapFactory.decodeFile(path);
+            return bitmap;
+        }
+        else return getBitmapFromAsset(getApplicationContext(),"sec/main/assets/images/1111.png");
+    }
+
+    public static Bitmap getBitmapFromAsset(Context context, String filePath) {
+        AssetManager assetManager = context.getAssets();
+
+        InputStream istr;
+        Bitmap bitmap = null;
+        try {
+            istr = assetManager.open(filePath);
+            bitmap = BitmapFactory.decodeStream(istr);
+        } catch (IOException e) {
+            // handle exception
+        }
+
+        return bitmap;
+    }
+
     public class MyAsyncTask extends AsyncTask<String, Void, String> {
 
         OkHttpClient client = new OkHttpClient().newBuilder()
@@ -130,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
                 .addFormDataPart("", "config_json.json",
                         RequestBody.create(MediaType.parse("application/octet-stream"),
                                 new File("src/main/assets/config_json.json")))
-                .addFormDataPart("", "pixtretemp.jpg",
+                .addFormDataPart("", "pixtreetemp.jpg",
                         RequestBody.create(MediaType.parse("application/octet-stream"),
                                 new File(getCacheDir().getName())))
                 .build();
@@ -166,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private Bitmap GetImageFromURL(String strImageURL)
+    /*private Bitmap GetImageFromURL(String strImageURL)
     {
         Bitmap imgBitmap = null;
         try
@@ -185,9 +228,9 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         return imgBitmap;
-    }
+    }*/
 
-    private void httpconnection() throws IOException {
+   /* private void httpconnection() throws IOException {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
         MediaType mediaType = MediaType.parse("text/plain");
@@ -205,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
                 .addHeader("Authorization", "Bearer supernova")
                 .build();
         Response response = client.newCall(request).execute();
-    }
+    }*/
 
     @Override
     public void onBackPressed() {
@@ -240,7 +283,13 @@ public class MainActivity extends AppCompatActivity {
                         in.close();
                     }
                     imageView.setImageBitmap(img);
-                    saveBitmaptoJpeg(img,"pixtretemp");
+                    try {
+                        saveBitmaptoJpeg(img,"pixtreetemp");
+                        Log.e("Mytag","image saved");
+                    }
+                    catch (Exception e) {
+                        Log.e("Mytag","image saved");
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
