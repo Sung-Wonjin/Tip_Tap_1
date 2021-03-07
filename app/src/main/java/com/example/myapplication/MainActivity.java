@@ -282,7 +282,9 @@ public class MainActivity extends AppCompatActivity {
                         in.close();
                     }
                     imageView.setImageBitmap(img);
-                    try {//사용자가 이미지를 선택함과 동시에 비트맵을 저장한다 "pixtreetemp.jpg"
+                    try {
+                        //사용자가 이미지를 선택함과 동시에 비트맵을 저장한다 "pixtreetemp.jpg"
+
                         saveBitmaptoJpeg(img,"pixtreetemp");
                         Log.e("Mytag","image saved");
                     }
@@ -318,9 +320,9 @@ public class MainActivity extends AppCompatActivity {
             cursor.close();
         }
         return null;
-    }
+    }*/
 }
-*/
+
 
 
 
