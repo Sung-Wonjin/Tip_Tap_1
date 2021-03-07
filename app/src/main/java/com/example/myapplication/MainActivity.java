@@ -110,12 +110,11 @@ public class MainActivity extends AppCompatActivity {
                 imageView1 = (ImageView) findViewById(R.id.image1);
                 Bitmap bitmap = getBitmapFromCacheDir("pixtreetemp");
                 imageView1.setImageBitmap(bitmap);
-
+                //비트맵을 캐쉬에서 가져와서 보여줌.
 
                 //BitmapDrawable drawable = (BitmapDrawable) imageView.getDrawable();
                 //Bitmap bmap = drawable.getBitmap();
                 //saveBitmaptoJpeg(bmap,"pixtretemp");
-
                 /*String imagestring = getBase64String(bmap);
                 byte[] decodedByteArray = Base64.decode(imagestring, Base64.NO_WRAP);
                 Bitmap decodedBitmap = BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.length);
@@ -147,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
             return bitmap;
         }
         else return getBitmapFromAsset(getApplicationContext(),"sec/main/assets/images/1111.png");
-    }
+    }//캐쉬 디렉토리에서 비트맵을 가져오는 함수. 함수를 변형해서 비트맵의 캐쉬상의 경로만 추출하여 가져와 전송하면 된다.
 
     public static Bitmap getBitmapFromAsset(Context context, String filePath) {
         AssetManager assetManager = context.getAssets();
@@ -283,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
                         in.close();
                     }
                     imageView.setImageBitmap(img);
-                    try {
+                    try {//사용자가 이미지를 선택함과 동시에 비트맵을 저장한다 "pixtreetemp.jpg"
                         saveBitmaptoJpeg(img,"pixtreetemp");
                         Log.e("Mytag","image saved");
                     }
@@ -301,7 +300,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private String getRealPathFromURI(Uri contentUri) {
+    /*private String getRealPathFromURI(Uri contentUri) {
         if (contentUri.getPath().startsWith("/storage"))
         {
             return contentUri.getPath();
@@ -321,7 +320,7 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 }
-
+*/
 
 
 
