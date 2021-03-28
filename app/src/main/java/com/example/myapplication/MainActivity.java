@@ -37,7 +37,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -47,14 +46,15 @@ import java.util.Base64.Encoder;
 import java.util.Random;
 
 import javax.net.ssl.HttpsURLConnection;
+import android.os.AsyncTask;
 
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
+import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
                 Bitmap bitmap = getBitmapFromCacheDir("pixtreetemp");
                 imageView1.setImageBitmap(bitmap);
                 //비트맵을 캐쉬에서 가져와서 보여줌.
-
+                //MyAsyncTask task = new MyAsyncTask().doInBackground();
                 //BitmapDrawable drawable = (BitmapDrawable) imageView.getDrawable();
                 //Bitmap bmap = drawable.getBitmap();
                 //saveBitmaptoJpeg(bmap,"pixtretemp");
@@ -148,6 +148,25 @@ public class MainActivity extends AppCompatActivity {
         else return getBitmapFromAsset(getApplicationContext(),"sec/main/assets/images/1111.png");
     }//캐쉬 디렉토리에서 비트맵을 가져오는 함수. 함수를 변형해서 비트맵의 캐쉬상의 경로만 추출하여 가져와 전송하면 된다.
 
+    private String getBitmapPathFromCacheDir(String name){
+        ArrayList<String> arrays = new ArrayList<>();
+
+        File file = new File(getCacheDir().toString());
+        File[] files = file.listFiles();
+        for(File tempFile : files) {
+            Log.d("MyTag",tempFile.getName());
+            if(tempFile.getName().contains(name)) {
+                arrays.add(tempFile.getName());
+            }
+        }
+        if(arrays.size() > 0) {
+            int randomPosition = new Random().nextInt(arrays.size());
+            String path = getCacheDir() + "/" + arrays.get(randomPosition);
+            return path;
+        }
+        else return null;
+    }
+
     public static Bitmap getBitmapFromAsset(Context context, String filePath) {
         AssetManager assetManager = context.getAssets();
 
@@ -159,38 +178,10 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             // handle exception
         }
-
         return bitmap;
     }
 
-    public class MyAsyncTask extends AsyncTask<String, Void, String> {
 
-        OkHttpClient client = new OkHttpClient().newBuilder()
-                .build();
-        MediaType mediaType = MediaType.parse("text/plain");
-        RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
-                .addFormDataPart("", "config_json.json",
-                        RequestBody.create(MediaType.parse("application/octet-stream"),
-                                new File("src/main/assets/config_json.json")))
-                .addFormDataPart("", "pixtreetemp.jpg",
-                        RequestBody.create(MediaType.parse("application/octet-stream"),
-                                new File(getCacheDir().getName())))
-                .build();
-        Request request = new Request.Builder()
-                .url("http://photo.pixtree.com:34569/sr/start/")
-                .method("POST", body)
-                .addHeader("Authorization", "Bearer supernova")
-                .build();
-        Response response = client.newCall(request).execute();
-
-        public MyAsyncTask() throws IOException {
-        }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            return null;
-        }
-    }
 
     public void saveBitmaptoJpeg(Bitmap bitmap, String name)
     {
@@ -208,47 +199,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /*private Bitmap GetImageFromURL(String strImageURL)
-    {
-        Bitmap imgBitmap = null;
-        try
-        {
-            URL url = new URL(strImageURL);
-            URLConnection conn = url.openConnection();
-            conn.connect();
-            int nSize = conn.getContentLength();
-            BufferedInputStream bis = new BufferedInputStream(conn.getInputStream(), nSize);
-            imgBitmap = BitmapFactory.decodeStream(bis);
-
-            bis.close();
-        }
-            catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        return imgBitmap;
-    }*/
-
-   /* private void httpconnection() throws IOException {
-        OkHttpClient client = new OkHttpClient().newBuilder()
-                .build();
-        MediaType mediaType = MediaType.parse("text/plain");
-        RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
-                .addFormDataPart("", "/C:/Users/SUNG/Documents/카카오톡 받은 파일/config_json.json",
-                        RequestBody.create(MediaType.parse("application/octet-stream"),
-                                new File("/C:/Users/SUNG/Documents/카카오톡 받은 파일/config_json.json")))
-                .addFormDataPart("", "/C:/Users/SUNG/Documents/카카오톡 받은 파일/sample.jpg",
-                        RequestBody.create(MediaType.parse("application/octet-stream"),
-                                new File("/C:/Users/SUNG/Documents/카카오톡 받은 파일/sample.jpg")))
-                .build();
-        Request request = new Request.Builder()
-                .url("http://photo.pixtree.com:34569/sr/start/")
-                .method("POST", body)
-                .addHeader("Authorization", "Bearer supernova")
-                .build();
-        Response response = client.newCall(request).execute();
-    }*/
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -260,13 +210,6 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
     }
 
-    public String getBase64String(Bitmap bitmap)
-    {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-        byte[] imageBytes = byteArrayOutputStream.toByteArray();
-        return Base64.encodeToString(imageBytes, Base64.NO_WRAP);
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -302,25 +245,85 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /*private String getRealPathFromURI(Uri contentUri) {
-        if (contentUri.getPath().startsWith("/storage"))
-        {
-            return contentUri.getPath();
+
+    public class MyAsyncTask extends AsyncTask<String, Void, String> {
+
+        public MyAsyncTask() {
         }
-        String id = DocumentsContract.getDocumentId(contentUri).split(":")[1];
-        String[] columns = { MediaStore.Files.FileColumns.DATA };
-        String selection = MediaStore.Files.FileColumns._ID + " = " + id;
-        Cursor cursor = getContentResolver().query(MediaStore.Files.getContentUri("external"), columns, selection, null, null);
-        try {
-            int columnIndex = cursor.getColumnIndex(columns[0]);
-            if (cursor.moveToFirst()) { return cursor.getString(columnIndex); }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            OkHttpClient client = new OkHttpClient().newBuilder()
+                    .build();
+            MediaType mediaType = MediaType.parse("text/plain");
+            RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                    .addFormDataPart("json", "config_json.json",
+                            RequestBody.create(MediaType.parse("application/octet-stream"),
+                                    new File("src/main/assets/config_json.json")))
+                    .addFormDataPart("image", "pixtreetemp.jpg",
+                            RequestBody.create(MediaType.parse("application/octet-stream"),
+                                    new File(getBitmapPathFromCacheDir("pixtreetemp.jpg"))))
+                    .build();
+            Request request = new Request.Builder()
+                    .url("http://photo.pixtree.com:34569/sr/start")
+                    .method("POST", body)
+                    .addHeader("Authorization", "Bearer supernova")
+                    .build();
+            try {
+                Response response = client.newCall(request).execute();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
         }
-        finally
-        {
-            cursor.close();
+    }
+
+    public class response {
+        private String description;
+        private int id;
+        private String link;
+        private int version;
+        private int waiting_number;
+        private int waiting_time;
+        private int result_code;
+        public String getDescription(){ return description; }
+        public int getId(){
+            return id;
         }
-        return null;
-    }*/
+        public String getLink(){
+            return link;
+        }
+        public int getVersion(){
+            return version;
+        }
+        public int getWaiting_number(){
+            return waiting_number;
+        }
+        public int getWaiting_time(){
+            return waiting_time;
+        }
+        public int getResunt_code(){ return result_code; }
+        public void setDescription(){
+            this.description = description;
+        }
+        public void setId(){
+            this.id = id;
+        }
+        public void setLink(){
+            this.link = link;
+        }
+        public void setVersion(){
+            this.version = version;
+        }
+        public void setWaiting_number(){
+            this.waiting_number = waiting_number;
+        }
+        public void setWaiting_time(){
+            this.waiting_time = waiting_time;
+        }
+        public void setResult_code(){ this.result_code = result_code; }
+    }
+
 }
 
 
