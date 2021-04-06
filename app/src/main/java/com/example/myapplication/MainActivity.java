@@ -1,20 +1,13 @@
 package com.example.myapplication;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
-import android.database.Cursor;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
-import android.os.Environment;
-import android.provider.DocumentsContract;
-import android.provider.MediaStore;
-import android.util.Base64;
 import android.util.Log;
 import android.widget.TextView;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -23,32 +16,26 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import androidx.appcompat.app.AppCompatActivity;
-import android.net.Uri;
-import android.content.Intent;
+import androidx.core.app.ActivityCompat;
+
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.ViewTarget;
+import com.google.gson.Gson;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Objects;
-import com.bumptech.glide.Glide;
-import java.util.Base64.Encoder;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
-import javax.net.ssl.HttpsURLConnection;
-import android.os.AsyncTask;
-
-import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -59,27 +46,21 @@ import okhttp3.MultipartBody;
 public class MainActivity extends AppCompatActivity {
 
 
+
     ImageView imageView;
     ImageView imageView1;
     Button button;
     Button button2;
-
+    Button button3;
+    Button button4;
     private BackPressCloseHandler backPressCloseHandler;
-    ImageActivity imageActivity;
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        /*MyAsyncTask mProcessTask = null;
-        try {
-            mProcessTask = new MyAsyncTask();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        mProcessTask.execute();*/
-
+        CheckPermission();
 
         imageView = (ImageView) findViewById(R.id.image);
         imageView1 = (ImageView) findViewById(R.id.image1);
@@ -88,7 +69,10 @@ public class MainActivity extends AppCompatActivity {
         backPressCloseHandler = new BackPressCloseHandler(this);
         button = (Button) findViewById(R.id.button);
         button2 = (Button) findViewById(R.id.button2);
+        button3 = (Button) findViewById(R.id.button3);
+        button4 = (Button) findViewById(R.id.button4);
         String name = "pixtretemp";
+        JsonToFile();
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -101,30 +85,83 @@ public class MainActivity extends AppCompatActivity {
             }
         });//listener of the butten for the image call
 
-        /*imageView.setOnClickListener(new View.OnClickListener() {
-        });//listener when the user touched the image. when the user click the image, android shows the whole image that can zoom in or zoom out.*/
-
         button2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 imageView1 = (ImageView) findViewById(R.id.image1);
-                Bitmap bitmap = getBitmapFromCacheDir("pixtreetemp");
-                imageView1.setImageBitmap(bitmap);
-                //비트맵을 캐쉬에서 가져와서 보여줌.
-                //MyAsyncTask task = new MyAsyncTask().doInBackground();
-                //BitmapDrawable drawable = (BitmapDrawable) imageView.getDrawable();
-                //Bitmap bmap = drawable.getBitmap();
-                //saveBitmaptoJpeg(bmap,"pixtretemp");
-                /*String imagestring = getBase64String(bmap);
-                byte[] decodedByteArray = Base64.decode(imagestring, Base64.NO_WRAP);
-                Bitmap decodedBitmap = BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.length);
-                imageView1.setImageBitmap(decodedBitmap);*/
-                //get image from imageview and incode the image to BASE64 stream. and then decode the image to bitmap.
-                //the code that makes json file to call rest api and parse response json shuld be in here
+                String json = JsonToString();
+                textview1.setText(json);
+
                 Toast.makeText(MainActivity.this,"butten2 pressed",Toast.LENGTH_SHORT).show();
             }
-
         });
+        button3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String result = MyAsyncTask();
+                textview1.setText(result);
+            }
+        });
+
+        button4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String temppath = getBitmapPathFromCacheDir("pixtreetemp.jpg");
+                textview1.setText(temppath);
+            }
+        });
+    }
+
+    public void CheckPermission() {
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+            if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.INTERNET)){
+                Toast.makeText(this,"정상적인 앱 실행을 위해서는 권한을 설정해야합니다",Toast.LENGTH_LONG).show();
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.INTERNET, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        1);
+            }
+            else{
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.INTERNET, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        1);
+            }
+        }
+
+    }
+
+    private String JsonToString(){
+        String json = null;
+        try {
+            InputStream is = getAssets().open("jsons/config_json.json");
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        Log.e("jsontostring",json);
+        return json;
+    }
+
+    private void JsonToFile(){
+        File jsonfile = new File(getCacheDir(),"jsonfile.json");
+        String json = null;
+        try {
+            InputStream is = getAssets().open("jsons/config_json.json");
+            OutputStream os = new FileOutputStream(jsonfile);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            os.write(buffer);
+            is.close();
+            os.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     private Bitmap getBitmapFromCacheDir(String name) {
@@ -145,8 +182,9 @@ public class MainActivity extends AppCompatActivity {
             Bitmap bitmap = BitmapFactory.decodeFile(path);
             return bitmap;
         }
-        else return getBitmapFromAsset(getApplicationContext(),"sec/main/assets/images/1111.png");
+        else return getBitmapFromAsset(getApplicationContext(),"images/1111.png");
     }//캐쉬 디렉토리에서 비트맵을 가져오는 함수. 함수를 변형해서 비트맵의 캐쉬상의 경로만 추출하여 가져와 전송하면 된다.
+
 
     private String getBitmapPathFromCacheDir(String name){
         ArrayList<String> arrays = new ArrayList<>();
@@ -154,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
         File file = new File(getCacheDir().toString());
         File[] files = file.listFiles();
         for(File tempFile : files) {
-            Log.d("MyTag",tempFile.getName());
+            Log.d("file_name",tempFile.getName());
             if(tempFile.getName().contains(name)) {
                 arrays.add(tempFile.getName());
             }
@@ -162,25 +200,25 @@ public class MainActivity extends AppCompatActivity {
         if(arrays.size() > 0) {
             int randomPosition = new Random().nextInt(arrays.size());
             String path = getCacheDir() + "/" + arrays.get(randomPosition);
+            Log.d("Path",path);
             return path;
         }
         else return null;
     }
 
-    public static Bitmap getBitmapFromAsset(Context context, String filePath) {
+    public static Bitmap getBitmapFromAsset(Context context, String filename) {
         AssetManager assetManager = context.getAssets();
 
         InputStream istr;
         Bitmap bitmap = null;
         try {
-            istr = assetManager.open(filePath);
+            istr = assetManager.open(filename);
             bitmap = BitmapFactory.decodeStream(istr);
         } catch (IOException e) {
             // handle exception
         }
         return bitmap;
     }
-
 
 
     public void saveBitmaptoJpeg(Bitmap bitmap, String name)
@@ -214,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        
+
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
 
@@ -226,7 +264,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     imageView.setImageBitmap(img);
                     try {
-                        //사용자가 이미지를 선택함과 동시에 비트맵을 저장한다 "pixtreetemp.jpg"
+                        //사용자가 이미지를 선택함과 동시에 캐쉬에 비트맵을 저장한다 "pixtreetemp.jpg"
 
                         saveBitmaptoJpeg(img,"pixtreetemp");
                         Log.e("Mytag","image saved");
@@ -240,42 +278,52 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         if(requestCode == 0)
-        {
-            
-        }
+        { }
     }
 
+    public String MyAsyncTask(){
 
-    public class MyAsyncTask extends AsyncTask<String, Void, String> {
+        final OkHttpClient client = new OkHttpClient().newBuilder()
+                .connectTimeout(3, TimeUnit.SECONDS)
+                .writeTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(3, TimeUnit.SECONDS)
+                .build();
+        final MediaType mediaType = MediaType.parse("text/plain");
+        final RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                .addFormDataPart("json", "jsonfile.json",
+                        RequestBody.create(MediaType.parse("application/json; charset=utf-8"),
+                                new File(getBitmapPathFromCacheDir("jsonfile.json"))))
+                .addFormDataPart("image", "pixtreetemp.jpg",
+                        RequestBody.create(MediaType.parse("image/*"),
+                                new File(getBitmapPathFromCacheDir("pixtreetemp.jpg"))))
+                .build();
+        final Request request = new Request.Builder()
+                .url("http://photo.pixtree.com:34569/sr/start")
+                .method("POST", body)
+                .addHeader("Authorization", "Bearer supernova")
+                .build();
 
-        public MyAsyncTask() {
-        }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            OkHttpClient client = new OkHttpClient().newBuilder()
-                    .build();
-            MediaType mediaType = MediaType.parse("text/plain");
-            RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
-                    .addFormDataPart("json", "config_json.json",
-                            RequestBody.create(MediaType.parse("application/octet-stream"),
-                                    new File("src/main/assets/config_json.json")))
-                    .addFormDataPart("image", "pixtreetemp.jpg",
-                            RequestBody.create(MediaType.parse("application/octet-stream"),
-                                    new File(getBitmapPathFromCacheDir("pixtreetemp.jpg"))))
-                    .build();
-            Request request = new Request.Builder()
-                    .url("http://photo.pixtree.com:34569/sr/start")
-                    .method("POST", body)
-                    .addHeader("Authorization", "Bearer supernova")
-                    .build();
-            try {
-                Response response = client.newCall(request).execute();
-            } catch (IOException e) {
-                e.printStackTrace();
+        AsyncTask<Void, Void, String> asyncTask = new AsyncTask<Void, Void, String>() {
+            @SuppressLint("StaticFieldLeak")
+            @Override
+            protected String doInBackground(Void... params) {
+                try {
+                    Response response = client.newCall(request).execute();
+                    if (!response.isSuccessful()) {
+                        Log.e("mytag","connection fail");
+                        return "network error";
+                    }
+                    TextView textView2 = (TextView) findViewById(R.id.textview1);
+                    textView2.setText(response.body().string());
+                    return response.body().string();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return "exception";
+                }
             }
-            return null;
-        }
+        };
+        asyncTask.execute();
+        return "eeeee";
     }
 
     public class response {
@@ -323,7 +371,6 @@ public class MainActivity extends AppCompatActivity {
         }
         public void setResult_code(){ this.result_code = result_code; }
     }
-
 }
 
 
