@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.TextView;
 import android.content.Intent;
@@ -22,12 +23,10 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
-import org.json.JSONObject;
-
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -98,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
         button3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String json = JsonToString();
                 String result = MyAsyncTask();
                 textview1.setText(result);
             }
@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         button4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String temppath = getBitmapPathFromCacheDir("pixtreetemp.jpg");
+                String temppath = getBitmapPathFromCacheDir("pixtreetemp.jpeg");
                 textview1.setText(temppath);
             }
         });
@@ -128,13 +128,12 @@ public class MainActivity extends AppCompatActivity {
                         1);
             }
         }
-
-    }
+    }//앱 실행 전에 권한을 설정받는 함수
 
     private String JsonToString(){
         String json = null;
         try {
-            InputStream is = getAssets().open("jsons/config_json.json");
+            InputStream is = new FileInputStream(new File(getBitmapPathFromCacheDir("jsonfile.json")));
             int size = is.available();
             byte[] buffer = new byte[size];
             is.read(buffer);
@@ -179,8 +178,7 @@ public class MainActivity extends AppCompatActivity {
         if(arrays.size() > 0) {
             int randomPosition = new Random().nextInt(arrays.size());
             String path = getCacheDir() + "/" + arrays.get(randomPosition);
-            Bitmap bitmap = BitmapFactory.decodeFile(path);
-            return bitmap;
+            return BitmapFactory.decodeFile(path);
         }
         else return getBitmapFromAsset(getApplicationContext(),"images/1111.png");
     }//캐쉬 디렉토리에서 비트맵을 가져오는 함수. 함수를 변형해서 비트맵의 캐쉬상의 경로만 추출하여 가져와 전송하면 된다.
@@ -191,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
 
         File file = new File(getCacheDir().toString());
         File[] files = file.listFiles();
-        for(File tempFile : files) {
+        for(File tempFile : Objects.requireNonNull(files)) {
             Log.d("file_name",tempFile.getName());
             if(tempFile.getName().contains(name)) {
                 arrays.add(tempFile.getName());
@@ -223,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void saveBitmaptoJpeg(Bitmap bitmap, String name)
     {
-        File tempfile = new File(getCacheDir(),name+".jpg");
+        File tempfile = new File(getCacheDir(),name+".jpeg");
 
         try{
             FileOutputStream out = new FileOutputStream(tempfile);
@@ -264,8 +262,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     imageView.setImageBitmap(img);
                     try {
-                        //사용자가 이미지를 선택함과 동시에 캐쉬에 비트맵을 저장한다 "pixtreetemp.jpg"
-
+                        //사용자가 이미지를 선택함과 동시에 캐쉬에 비트맵을 저장한다 "pixtreetemp.jpeg"
                         saveBitmaptoJpeg(img,"pixtreetemp");
                         Log.e("Mytag","image saved");
                     }
@@ -281,61 +278,90 @@ public class MainActivity extends AppCompatActivity {
         { }
     }
 
-    public String MyAsyncTask(){
+    public responsess MyAsyncTask(){
 
+        TextView textview1 = (TextView) findViewById(R.id.textview1);
         final OkHttpClient client = new OkHttpClient().newBuilder()
-                .connectTimeout(3, TimeUnit.SECONDS)
-                .writeTimeout(10, TimeUnit.SECONDS)
-                .readTimeout(3, TimeUnit.SECONDS)
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .followRedirects(false)
                 .build();
         final MediaType mediaType = MediaType.parse("text/plain");
         final RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
                 .addFormDataPart("json", "jsonfile.json",
-                        RequestBody.create(MediaType.parse("application/json; charset=utf-8"),
-                                new File(getBitmapPathFromCacheDir("jsonfile.json"))))
-                .addFormDataPart("image", "pixtreetemp.jpg",
-                        RequestBody.create(MediaType.parse("image/*"),
-                                new File(getBitmapPathFromCacheDir("pixtreetemp.jpg"))))
+                        RequestBody.create(MediaType.parse("application/json"),
+                                new File(Objects.requireNonNull(getBitmapPathFromCacheDir("jsonfile.json")))))
+                .addFormDataPart("image", "pixtreetemp.jpeg",
+                        RequestBody.create(MediaType.parse("image/jpeg"),
+                                new File(Objects.requireNonNull(getBitmapPathFromCacheDir("pixtreetemp.jpeg")))))
                 .build();
         final Request request = new Request.Builder()
                 .url("http://photo.pixtree.com:34569/sr/start")
                 .method("POST", body)
                 .addHeader("Authorization", "Bearer supernova")
                 .build();
-
         AsyncTask<Void, Void, String> asyncTask = new AsyncTask<Void, Void, String>() {
+
             @SuppressLint("StaticFieldLeak")
             @Override
             protected String doInBackground(Void... params) {
                 try {
                     Response response = client.newCall(request).execute();
-                    if (!response.isSuccessful()) {
-                        Log.e("mytag","connection fail");
+                    /*if (!response.isSuccessful()) {
+                        Log.e("mytag", "connection fail");
                         return "network error";
-                    }
-                    TextView textView2 = (TextView) findViewById(R.id.textview1);
-                    textView2.setText(response.body().string());
+                    }*/
                     return response.body().string();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    return "exception";
+                    return null;
+                }
+            }
+            @Override
+            protected void onPostExecute (String str){
+                TextView textview1 = (TextView) findViewById(R.id.textview1);
+                super.onPostExecute(str);
+                if (str != null) {
+                    textview1.setText(str);
+                    Log.e("response",str);
                 }
             }
         };
         asyncTask.execute();
-        return "eeeee";
+        Handler mHandler = new Handler();
+        mHandler.postDelayed(new Runnable(){
+            @Override
+            public void run() {
+                Gson gson = new Gson();
+                String Responsestring;
+                TextView textview1 = (TextView) findViewById(R.id.textview1);
+                Responsestring = (String) textview1.getText();
+                Log.e("response",Responsestring);
+                responsess respclass = gson.fromJson(Responsestring, responsess.class);
+                respclass.logall();
+            }
+        }, 3000);
+        return null;
     }
 
-    public class response {
-        private String description;
-        private int id;
-        private String link;
-        private int version;
-        private int waiting_number;
-        private int waiting_time;
-        private int result_code;
+    public static class responsess {
+        private String description=null;
+        private String id=null;
+        private String link=null;
+        private int version=0;
+        private int waiting_number=0;
+        private int waiting_time=0;
+        private int result_code=0;
+        public void logall(){
+            Log.e("description",description);
+            Log.e("id",id);
+            Log.e("link",link);
+            Log.e("version",Integer.toString(version));
+            Log.e("waiting number",Integer.toString(waiting_number));
+            Log.e("waiting time",Integer.toString(waiting_time));
+            Log.e("result code",Integer.toString(result_code));
+        }
         public String getDescription(){ return description; }
-        public int getId(){
+        public String getId(){
             return id;
         }
         public String getLink(){
