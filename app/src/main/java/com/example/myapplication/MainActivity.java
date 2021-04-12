@@ -22,6 +22,12 @@ import androidx.core.app.ActivityCompat;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.squareup.picasso.Picasso;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,7 +39,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -53,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     Button button3;
     Button button4;
     private BackPressCloseHandler backPressCloseHandler;
+    String url;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -71,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         button3 = (Button) findViewById(R.id.button3);
         button4 = (Button) findViewById(R.id.button4);
         String name = "pixtretemp";
+        responsess res;
         JsonToFile();
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,24 +97,40 @@ public class MainActivity extends AppCompatActivity {
                 imageView1 = (ImageView) findViewById(R.id.image1);
                 String json = JsonToString();
                 textview1.setText(json);
-
                 Toast.makeText(MainActivity.this,"butten2 pressed",Toast.LENGTH_SHORT).show();
             }
         });
         button3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String json = JsonToString();
+                imageView1 = (ImageView) findViewById(R.id.image1);
                 String result = MyAsyncTask();
-                textview1.setText(result);
+                Gson gson = new Gson();
+                responsess resp = gson.fromJson(result,responsess.class);
+                resp.logall();
+                JsonParser parser = new JsonParser();
+                JsonElement element = parser.parse(result);
+                url = element.getAsJsonObject().get("link").getAsString();
+                Log.d("url",url);
+                final int waitingtime = element.getAsJsonObject().get("waiting_time").getAsInt();
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Picasso
+                                .get()
+                                .load(url)
+                                .into(imageView1);
+                    }
+                },waitingtime*1000);
+
             }
         });
 
         button4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String temppath = getBitmapPathFromCacheDir("pixtreetemp.jpeg");
-                textview1.setText(temppath);
+
             }
         });
     }
@@ -128,7 +151,8 @@ public class MainActivity extends AppCompatActivity {
                         1);
             }
         }
-    }//앱 실행 전에 권한을 설정받는 함수
+
+    }
 
     private String JsonToString(){
         String json = null;
@@ -278,8 +302,7 @@ public class MainActivity extends AppCompatActivity {
         { }
     }
 
-    public responsess MyAsyncTask(){
-
+    public String MyAsyncTask(){
         TextView textview1 = (TextView) findViewById(R.id.textview1);
         final OkHttpClient client = new OkHttpClient().newBuilder()
                 .connectTimeout(30, TimeUnit.SECONDS)
@@ -318,39 +341,36 @@ public class MainActivity extends AppCompatActivity {
             }
             @Override
             protected void onPostExecute (String str){
-                TextView textview1 = (TextView) findViewById(R.id.textview1);
                 super.onPostExecute(str);
+                TextView textview1 = (TextView) findViewById(R.id.textview1);
+
                 if (str != null) {
                     textview1.setText(str);
                     Log.e("response",str);
+                    Gson gson = new Gson();
+                    responsess respclass = gson.fromJson(str, responsess.class);
+                    //respclass.logall();
                 }
             }
         };
-        asyncTask.execute();
-        Handler mHandler = new Handler();
-        mHandler.postDelayed(new Runnable(){
-            @Override
-            public void run() {
-                Gson gson = new Gson();
-                String Responsestring;
-                TextView textview1 = (TextView) findViewById(R.id.textview1);
-                Responsestring = (String) textview1.getText();
-                Log.e("response",Responsestring);
-                responsess respclass = gson.fromJson(Responsestring, responsess.class);
-                respclass.logall();
-            }
-        }, 3000);
+        try {
+            String result = asyncTask.execute().get();
+            return result;
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
         return null;
     }
 
     public static class responsess {
-        private String description=null;
-        private String id=null;
-        private String link=null;
-        private int version=0;
-        private int waiting_number=0;
-        private int waiting_time=0;
-        private int result_code=0;
+        private String description;
+        private String id;
+        private String link;
+        private int version;
+        private int waiting_number;
+        private int waiting_time;
+        private int result_code;
         public void logall(){
             Log.e("description",description);
             Log.e("id",id);
