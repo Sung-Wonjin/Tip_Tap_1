@@ -93,28 +93,27 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 imageView1 = (ImageView) findViewById(R.id.image1);
-                String result = MyAsyncTask();
-                Gson gson = new Gson();
-                responsess resp = gson.fromJson(result,responsess.class);
-                resp.logall();
-                JsonParser parser = new JsonParser();
-                JsonElement element = parser.parse(result);
-                url = element.getAsJsonObject().get("link").getAsString();
-                Log.d("url",url);
-                final int waitingtime = element.getAsJsonObject().get("waiting_time").getAsInt();
+                if(imageView1 != null){
+                    String result = MyAsyncTask();
+                    Gson gson = new Gson();
+                    responsess resp = gson.fromJson(result, responsess.class);
+                    resp.logall();
+                    JsonParser parser = new JsonParser();
+                    JsonElement element = parser.parse(result);
+                    url = element.getAsJsonObject().get("link").getAsString();
+                    Log.d("url", url);
+                    final int waitingtime = element.getAsJsonObject().get("waiting_time").getAsInt();
 
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        Picasso
-                                .get()
-                                .load(url)
-                                .into(imageView1);
-                        BitmapDrawable temp = (BitmapDrawable) imageView1.getDrawable();
-                        Bitmap bitmap = temp.getBitmap();
-                        saveBitmaptoJpeg(bitmap,"enhanced");
-                    }
-                },waitingtime*1000);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Picasso
+                                    .get()
+                                    .load(url)
+                                    .into(imageView1);
+                        }
+                    }, waitingtime * 1000);
+                }
             }
         });
 
@@ -131,11 +130,11 @@ public class MainActivity extends AppCompatActivity {
                 bitmap = getBitmapFromCacheDir("pixtreetemp.jpeg");
                 imageView1.setImageBitmap(bitmap);
                 }
-                else if(status == MotionEvent.ACTION_UP)
+                if(status == MotionEvent.ACTION_UP)
                 {
-                    Bitmap bitmap1;
-                    bitmap1 = getBitmapFromCacheDir("enhanced.jpeg");
-                    imageView1.setImageBitmap(bitmap1);
+                    Bitmap bitmap;
+                    bitmap = getBitmapFromCacheDir("pixtreetemp.jpeg");
+                    Log.e("up","11");
                 }
                 return false;
             }
@@ -200,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
         File file = new File(getCacheDir().toString());
         File[] files = file.listFiles();
         for(File tempFile : files) {
-            Log.d("MyTag",tempFile.getName());
+            Log.d("file_list",tempFile.getName());
             if(tempFile.getName().contains(name)) {
                 arrays.add(tempFile.getName());
             }
