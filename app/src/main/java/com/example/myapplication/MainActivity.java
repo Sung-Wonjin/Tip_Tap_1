@@ -110,6 +110,9 @@ public class MainActivity extends AppCompatActivity {
                                 .get()
                                 .load(url)
                                 .into(imageView1);
+                        BitmapDrawable temp = (BitmapDrawable) imageView1.getDrawable();
+                        Bitmap bitmap = temp.getBitmap();
+                        saveBitmaptoJpeg(bitmap,"enhanced");
                     }
                 },waitingtime*1000);
             }
@@ -120,14 +123,18 @@ public class MainActivity extends AppCompatActivity {
             public boolean onTouch(View v, MotionEvent event) {
                 imageView1 = (ImageView) findViewById(R.id.image1);
                 int status = event.getAction();
-                BitmapDrawable temp = (BitmapDrawable) imageView1.getDrawable();
-                Bitmap bitmap = temp.getBitmap();
-                saveBitmaptoJpeg(bitmap,"enhanced");
+                //BitmapDrawable temp = (BitmapDrawable) imageView1.getDrawable();
+                //Bitmap bitmap = temp.getBitmap();
+                //saveBitmaptoJpeg(bitmap,"enhanced");
+                if(status == MotionEvent.ACTION_DOWN){
+                Bitmap bitmap;
                 bitmap = getBitmapFromCacheDir("pixtreetemp.jpeg");
                 imageView1.setImageBitmap(bitmap);
-                if(status == MotionEvent.ACTION_UP)
+                }
+                else if(status == MotionEvent.ACTION_UP)
                 {
-                    Bitmap bitmap1 = getBitmapFromCacheDir("enhanced.jpeg");
+                    Bitmap bitmap1;
+                    bitmap1 = getBitmapFromCacheDir("enhanced.jpeg");
                     imageView1.setImageBitmap(bitmap1);
                 }
                 return false;
