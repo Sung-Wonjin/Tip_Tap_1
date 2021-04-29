@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000"
+    android:background="#ffffff"
     tools:context=".IntroActivity">
 
     <LinearLayout
@@ -14,23 +14,26 @@
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/tiptap"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
             android:fontFamily="casual"
             android:text="Tip-Tap"
-            android:textColor="#ffffff"
+            android:textColor="#000000"
             android:textSize="90sp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="150dp"
-            android:text="Pixtree"
-            android:textColor="#ffffff"
-            android:textSize="30sp" />
+
+
+        <ImageView
+            android:layout_width="152dp"
+            android:layout_height="21dp"
+            android:id="@+id/logo"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="200dp"
+            android:src="@drawable/pixtree"/>
+
 
     </LinearLayout>
 

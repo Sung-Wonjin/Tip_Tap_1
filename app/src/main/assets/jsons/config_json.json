@@ -5,7 +5,7 @@
     },
     "output": {
         "lossless": 0,
-        "compress": 7,
+        "compress": 0,
         "protocol": "link",
         "size": 1
     },

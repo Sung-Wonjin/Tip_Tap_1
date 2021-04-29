@@ -5,9 +5,11 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.widget.TextView;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -21,7 +23,6 @@ import androidx.core.app.ActivityCompat;
 
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -34,7 +35,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -54,13 +54,11 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    ImageView imageView;
     ImageView imageView1;
     Button button;
     Button button2;
-    Button button3;
-    Button button4;
     private BackPressCloseHandler backPressCloseHandler;
+    String url;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -69,15 +67,11 @@ public class MainActivity extends AppCompatActivity {
 
         CheckPermission();
 
-        imageView = (ImageView) findViewById(R.id.image);
         imageView1 = (ImageView) findViewById(R.id.image1);
         final TextView textview1 = (TextView) findViewById(R.id.textview1);
-        final String FileUri;
         backPressCloseHandler = new BackPressCloseHandler(this);
         button = (Button) findViewById(R.id.button);
         button2 = (Button) findViewById(R.id.button2);
-        button3 = (Button) findViewById(R.id.button3);
-        button4 = (Button) findViewById(R.id.button4);
         String name = "pixtretemp";
         responsess res;
         JsonToFile();
@@ -89,20 +83,13 @@ public class MainActivity extends AppCompatActivity {
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(intent, 1);
 
+                //Intent toNext = new Intent(getApplicationContext(),ImageActivity.class);
+
 
             }
         });//listener of the butten for the image call
 
         button2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                imageView1 = (ImageView) findViewById(R.id.image1);
-                String json = JsonToString();
-                textview1.setText(json);
-                Toast.makeText(MainActivity.this,"butten2 pressed",Toast.LENGTH_SHORT).show();
-            }
-        });
-        button3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 imageView1 = (ImageView) findViewById(R.id.image1);
@@ -112,20 +99,38 @@ public class MainActivity extends AppCompatActivity {
                 resp.logall();
                 JsonParser parser = new JsonParser();
                 JsonElement element = parser.parse(result);
-                String url = element.getAsJsonObject().get("link").getAsString();
-                String link = url;
+                url = element.getAsJsonObject().get("link").getAsString();
                 Log.d("url",url);
-                Picasso.get()
-                        .load(element.getAsJsonObject().get("link").getAsString())
-                        .fit()
-                        .into(imageView1);
+                final int waitingtime = element.getAsJsonObject().get("waiting_time").getAsInt();
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Picasso
+                                .get()
+                                .load(url)
+                                .into(imageView1);
+                    }
+                },waitingtime*1000);
             }
         });
 
-        button4.setOnClickListener(new View.OnClickListener() {
+        imageView1.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View view) {
-
+            public boolean onTouch(View v, MotionEvent event) {
+                imageView1 = (ImageView) findViewById(R.id.image1);
+                int status = event.getAction();
+                BitmapDrawable temp = (BitmapDrawable) imageView1.getDrawable();
+                Bitmap bitmap = temp.getBitmap();
+                saveBitmaptoJpeg(bitmap,"enhanced");
+                bitmap = getBitmapFromCacheDir("pixtreetemp.jpeg");
+                imageView1.setImageBitmap(bitmap);
+                if(status == MotionEvent.ACTION_UP)
+                {
+                    Bitmap bitmap1 = getBitmapFromCacheDir("enhanced.jpeg");
+                    imageView1.setImageBitmap(bitmap1);
+                }
+                return false;
             }
         });
     }
@@ -146,7 +151,6 @@ public class MainActivity extends AppCompatActivity {
                         1);
             }
         }
-
     }
 
     private String JsonToString(){
@@ -279,7 +283,7 @@ public class MainActivity extends AppCompatActivity {
                     if (in != null) {
                         in.close();
                     }
-                    imageView.setImageBitmap(img);
+                    imageView1.setImageBitmap(img);
                     try {
                         //사용자가 이미지를 선택함과 동시에 캐쉬에 비트맵을 저장한다 "pixtreetemp.jpeg"
                         saveBitmaptoJpeg(img,"pixtreetemp");
@@ -293,8 +297,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-        if(requestCode == 0)
-        { }
+
     }
 
     public String MyAsyncTask(){
