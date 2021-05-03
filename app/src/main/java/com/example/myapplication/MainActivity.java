@@ -28,9 +28,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -51,8 +48,6 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 
 public class MainActivity extends AppCompatActivity {
-
-
 
     ImageView imageView1;
     Button button;
@@ -93,27 +88,34 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 imageView1 = (ImageView) findViewById(R.id.image1);
-                if(imageView1 != null){
-                    String result = MyAsyncTask();
-                    Gson gson = new Gson();
-                    responsess resp = gson.fromJson(result, responsess.class);
-                    resp.logall();
-                    JsonParser parser = new JsonParser();
-                    JsonElement element = parser.parse(result);
-                    url = element.getAsJsonObject().get("link").getAsString();
-                    Log.d("url", url);
-                    final int waitingtime = element.getAsJsonObject().get("waiting_time").getAsInt();
+                String result = MyAsyncTask();
+                Gson gson = new Gson();
+                responsess resp = gson.fromJson(result,responsess.class);
+                resp.logall();
+                JsonParser parser = new JsonParser();
+                JsonElement element = parser.parse(result);
+                url = element.getAsJsonObject().get("link").getAsString();
+                Log.d("url",url);
+                final int waitingtime = element.getAsJsonObject().get("waiting_time").getAsInt();
 
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            Picasso
-                                    .get()
-                                    .load(url)
-                                    .into(imageView1);
-                        }
-                    }, waitingtime * 1000);
-                }
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Picasso
+                                .get()
+                                .load(url)
+                                .into(imageView1);
+                    }
+                },waitingtime*1000);
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        BitmapDrawable temp = (BitmapDrawable) imageView1.getDrawable();
+                        Bitmap bitmap = temp.getBitmap();
+                        saveBitmaptoJpeg(bitmap,"enhanced");
+                    }
+                },waitingtime*1050);
             }
         });
 
@@ -122,21 +124,32 @@ public class MainActivity extends AppCompatActivity {
             public boolean onTouch(View v, MotionEvent event) {
                 imageView1 = (ImageView) findViewById(R.id.image1);
                 int status = event.getAction();
-                //BitmapDrawable temp = (BitmapDrawable) imageView1.getDrawable();
-                //Bitmap bitmap = temp.getBitmap();
-                //saveBitmaptoJpeg(bitmap,"enhanced");
-                if(status == MotionEvent.ACTION_DOWN){
-                Bitmap bitmap;
-                bitmap = getBitmapFromCacheDir("pixtreetemp.jpeg");
-                imageView1.setImageBitmap(bitmap);
-                }
-                if(status == MotionEvent.ACTION_UP)
-                {
-                    Bitmap bitmap;
+                /*if(status == MotionEvent.ACTION_DOWN) {
+                    BitmapDrawable temp = (BitmapDrawable) imageView1.getDrawable();
+                    Bitmap bitmap = temp.getBitmap();
+                    saveBitmaptoJpeg(bitmap, "enhanced");
                     bitmap = getBitmapFromCacheDir("pixtreetemp.jpeg");
-                    Log.e("up","11");
+                    imageView1.setImageBitmap(bitmap);
+                    if (status == MotionEvent.ACTION_UP) {
+                        Bitmap bitmap1 = getBitmapFromCacheDir("enhanced.jpeg");
+                        imageView1.setImageBitmap(bitmap1);
+                        return false;
+                    }
+                }*/
+                switch(event.getAction()){
+                    case MotionEvent.ACTION_DOWN:{
+                        Bitmap bmp = getBitmapFromCacheDir("pixtreetemp.jpeg");
+                        imageView1.setImageBitmap(bmp);
+                        return true;
+                    }
+                    case MotionEvent.ACTION_UP:{
+                        Bitmap bmp = getBitmapFromCacheDir("enhanced.jpeg");
+                        imageView1.setImageBitmap(bmp);
+                        return false;
+                    }
+                    default:return false;
                 }
-                return false;
+                //return false;
             }
         });
     }
@@ -199,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
         File file = new File(getCacheDir().toString());
         File[] files = file.listFiles();
         for(File tempFile : files) {
-            Log.d("file_list",tempFile.getName());
+            Log.d("MyTag",tempFile.getName());
             if(tempFile.getName().contains(name)) {
                 arrays.add(tempFile.getName());
             }
