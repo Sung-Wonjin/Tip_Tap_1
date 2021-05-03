@@ -5,24 +5,34 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/ImageView1"
-        android:layout_width="300dp"
-        android:layout_height="400dp"
-        android:layout_gravity="center"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="55dp"
-        tools:layout_editor_absoluteY="54dp"></ImageView>
 
-    <Button
-        android:id="@+id/button1"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:layout_below="@+id/ImageView1"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="68dp"
-        tools:layout_editor_absoluteY="484dp"
-        android:text="button1"
-        ></Button>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#ffffff">
+
+
+        <ImageView
+            android:id="@+id/image1"
+            android:layout_width="300sp"
+            android:layout_height="400sp"
+            android:layout_alignRight="@id/image1"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="50dp"
+            android:foregroundGravity="top" />
+
+        <Button
+            android:id="@+id/button1"
+            android:layout_below="@+id/image1"
+            android:layout_marginTop="20sp"
+            android:layout_marginLeft="100sp"
+            android:layout_width="100sp"
+            android:layout_height="50sp"
+            android:text="이미지 처리"
+            android:textSize="10sp" />
+
+    </RelativeLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

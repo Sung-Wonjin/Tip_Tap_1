@@ -1,10 +1,16 @@
 package com.example.myapplication;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -18,6 +24,10 @@ import com.google.gson.JsonParser;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Random;
@@ -40,6 +50,11 @@ public class ImageActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image);
+        imageView1 = (ImageView) findViewById(R.id.image1);
+        button1 = (Button) findViewById(R.id.button1);
+        Bitmap bitmap = getBitmapFromCacheDir("pixtreetemp.jpeg");
+        imageView1.setImageBitmap(bitmap);
+
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -63,8 +78,95 @@ public class ImageActivity extends AppCompatActivity {
                                 .into(imageView1);
                     }
                 },waitingtime*1000);
+
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        BitmapDrawable temp = (BitmapDrawable) imageView1.getDrawable();
+                        Bitmap bitmap = temp.getBitmap();
+                        saveBitmaptoJpeg(bitmap,"enhanced");
+                    }
+                },waitingtime*1050);
             }
         });
+
+
+
+        imageView1.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                imageView1 = (ImageView) findViewById(R.id.image1);
+                int status = event.getAction();
+
+                switch(event.getAction()){
+                    case MotionEvent.ACTION_DOWN:{
+                        Bitmap bmp = getBitmapFromCacheDir("pixtreetemp.jpeg");
+                        imageView1.setImageBitmap(bmp);
+                        return true;
+                    }
+                    case MotionEvent.ACTION_UP:{
+                        Bitmap bmp = getBitmapFromCacheDir("enhanced.jpeg");
+                        imageView1.setImageBitmap(bmp);
+                        return false;
+                    }
+                    default:return false;
+                }
+            }
+        });
+
+    }
+
+
+    private Bitmap getBitmapFromCacheDir(String name) {
+
+        ArrayList<String> arrays = new ArrayList<>();
+
+        File file = new File(getCacheDir().toString());
+        File[] files = file.listFiles();
+        for(File tempFile : files) {
+            Log.d("MyTag",tempFile.getName());
+            if(tempFile.getName().contains(name)) {
+                arrays.add(tempFile.getName());
+            }
+        }
+        if(arrays.size() > 0) {
+            int randomPosition = new Random().nextInt(arrays.size());
+            String path = getCacheDir() + "/" + arrays.get(randomPosition);
+            return BitmapFactory.decodeFile(path);
+        }
+        else return getBitmapFromAsset(getApplicationContext(),"images/1111.png");
+    }//캐쉬 디렉토리에서 비트맵을 가져오는 함수. 함수를 변형해서 비트맵의 캐쉬상의 경로만 추출하여 가져와 전송하면 된다.
+
+
+    public static Bitmap getBitmapFromAsset(Context context, String filename) {
+        AssetManager assetManager = context.getAssets();
+
+        InputStream istr;
+        Bitmap bitmap = null;
+        try {
+            istr = assetManager.open(filename);
+            bitmap = BitmapFactory.decodeStream(istr);
+        } catch (IOException e) {
+            // handle exception
+        }
+        return bitmap;
+    }
+
+    public void saveBitmaptoJpeg(Bitmap bitmap, String name)
+    {
+        File tempfile = new File(getCacheDir(),name+".jpeg");
+
+        try{
+            FileOutputStream out = new FileOutputStream(tempfile);
+            bitmap.compress(Bitmap.CompressFormat.JPEG,100,out);
+            out.close();
+        }
+        catch (FileNotFoundException e) {
+            Log.e("MyTag","FileNotFoundException : " + e.getMessage());
+        } catch (IOException e) {
+            Log.e("MyTag","IOException : " + e.getMessage());
+        }
     }
 
     private String getBitmapPathFromCacheDir(String name){
@@ -88,7 +190,7 @@ public class ImageActivity extends AppCompatActivity {
     }
 
     public String MyAsyncTask(){
-        TextView textview1 = (TextView) findViewById(R.id.textview1);
+        //TextView textview1 = (TextView) findViewById(R.id.textview1);
         final OkHttpClient client = new OkHttpClient().newBuilder()
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .followRedirects(false)
@@ -127,10 +229,10 @@ public class ImageActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute (String str){
                 super.onPostExecute(str);
-                TextView textview1 = (TextView) findViewById(R.id.textview1);
+                //TextView textview1 = (TextView) findViewById(R.id.textview1);
 
                 if (str != null) {
-                    textview1.setText(str);
+                    //textview1.setText(str);
                     Log.e("response",str);
                     Gson gson = new Gson();
                     MainActivity.responsess respclass = gson.fromJson(str, MainActivity.responsess.class);

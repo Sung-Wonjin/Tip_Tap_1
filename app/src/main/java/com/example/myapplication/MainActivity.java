@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     ImageView imageView1;
     Button button;
     Button button2;
+    Button button3;
     private BackPressCloseHandler backPressCloseHandler;
     String url;
 
@@ -67,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
         backPressCloseHandler = new BackPressCloseHandler(this);
         button = (Button) findViewById(R.id.button);
         button2 = (Button) findViewById(R.id.button2);
+        button3 = (Button) findViewById(R.id.button3);
         String name = "pixtretemp";
         responsess res;
         JsonToFile();
@@ -119,23 +121,20 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        button3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this,ImageActivity.class);
+                startActivity(intent);
+            }
+        });
+
         imageView1.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 imageView1 = (ImageView) findViewById(R.id.image1);
                 int status = event.getAction();
-                /*if(status == MotionEvent.ACTION_DOWN) {
-                    BitmapDrawable temp = (BitmapDrawable) imageView1.getDrawable();
-                    Bitmap bitmap = temp.getBitmap();
-                    saveBitmaptoJpeg(bitmap, "enhanced");
-                    bitmap = getBitmapFromCacheDir("pixtreetemp.jpeg");
-                    imageView1.setImageBitmap(bitmap);
-                    if (status == MotionEvent.ACTION_UP) {
-                        Bitmap bitmap1 = getBitmapFromCacheDir("enhanced.jpeg");
-                        imageView1.setImageBitmap(bitmap1);
-                        return false;
-                    }
-                }*/
+
                 switch(event.getAction()){
                     case MotionEvent.ACTION_DOWN:{
                         Bitmap bmp = getBitmapFromCacheDir("pixtreetemp.jpeg");
@@ -149,7 +148,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                     default:return false;
                 }
-                //return false;
             }
         });
     }

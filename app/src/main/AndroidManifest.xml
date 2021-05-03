@@ -22,5 +22,9 @@
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
+        <activity android:name=".ImageActivity"
+            android:parentActivityName=".MainActivity"
+            />
+
     </application>
 </manifest>
