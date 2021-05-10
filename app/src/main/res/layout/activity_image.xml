@@ -32,6 +32,16 @@
             android:text="이미지 처리"
             android:textSize="10sp" />
 
+        <Button
+            android:layout_width="100sp"
+            android:layout_height="50sp"
+            android:layout_toRightOf="@+id/button1"
+            android:layout_below="@+id/image1"
+            android:layout_marginTop="20sp"
+            android:layout_marginLeft="10sp"
+            android:text="이미지 저장"
+            android:textsize="10sp"/>
+
     </RelativeLayout>
 
 
