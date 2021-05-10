@@ -70,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
         button2 = (Button) findViewById(R.id.button2);
         button3 = (Button) findViewById(R.id.button3);
         String name = "pixtretemp";
-        responsess res;
         JsonToFile();
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,41 +85,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });//listener of the butten for the image call
 
-        button2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                imageView1 = (ImageView) findViewById(R.id.image1);
-                String result = MyAsyncTask();
-                Gson gson = new Gson();
-                responsess resp = gson.fromJson(result,responsess.class);
-                resp.logall();
-                JsonParser parser = new JsonParser();
-                JsonElement element = parser.parse(result);
-                url = element.getAsJsonObject().get("link").getAsString();
-                Log.d("url",url);
-                final int waitingtime = element.getAsJsonObject().get("waiting_time").getAsInt();
-
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        Picasso
-                                .get()
-                                .load(url)
-                                .into(imageView1);
-                    }
-                },waitingtime*1000);
-
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        BitmapDrawable temp = (BitmapDrawable) imageView1.getDrawable();
-                        Bitmap bitmap = temp.getBitmap();
-                        saveBitmaptoJpeg(bitmap,"enhanced");
-                    }
-                },waitingtime*1050);
-            }
-        });
-
         button3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -129,27 +93,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        imageView1.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                imageView1 = (ImageView) findViewById(R.id.image1);
-                int status = event.getAction();
-
-                switch(event.getAction()){
-                    case MotionEvent.ACTION_DOWN:{
-                        Bitmap bmp = getBitmapFromCacheDir("pixtreetemp.jpeg");
-                        imageView1.setImageBitmap(bmp);
-                        return true;
-                    }
-                    case MotionEvent.ACTION_UP:{
-                        Bitmap bmp = getBitmapFromCacheDir("enhanced.jpeg");
-                        imageView1.setImageBitmap(bmp);
-                        return false;
-                    }
-                    default:return false;
-                }
-            }
-        });
     }
 
     public void CheckPermission() {
@@ -170,22 +113,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private String JsonToString(){
-        String json = null;
-        try {
-            InputStream is = new FileInputStream(new File(getBitmapPathFromCacheDir("jsonfile.json")));
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            json = new String(buffer);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        Log.e("jsontostring",json);
-        return json;
-    }
-
     private void JsonToFile(){
         File jsonfile = new File(getCacheDir(),"jsonfile.json");
         String json = null;
@@ -202,62 +129,6 @@ public class MainActivity extends AppCompatActivity {
             ex.printStackTrace();
         }
     }
-
-    private Bitmap getBitmapFromCacheDir(String name) {
-
-        ArrayList<String> arrays = new ArrayList<>();
-
-        File file = new File(getCacheDir().toString());
-        File[] files = file.listFiles();
-        for(File tempFile : files) {
-            Log.d("MyTag",tempFile.getName());
-            if(tempFile.getName().contains(name)) {
-                arrays.add(tempFile.getName());
-            }
-        }
-        if(arrays.size() > 0) {
-            int randomPosition = new Random().nextInt(arrays.size());
-            String path = getCacheDir() + "/" + arrays.get(randomPosition);
-            return BitmapFactory.decodeFile(path);
-        }
-        else return getBitmapFromAsset(getApplicationContext(),"images/1111.png");
-    }//캐쉬 디렉토리에서 비트맵을 가져오는 함수. 함수를 변형해서 비트맵의 캐쉬상의 경로만 추출하여 가져와 전송하면 된다.
-
-
-    private String getBitmapPathFromCacheDir(String name){
-        ArrayList<String> arrays = new ArrayList<>();
-
-        File file = new File(getCacheDir().toString());
-        File[] files = file.listFiles();
-        for(File tempFile : Objects.requireNonNull(files)) {
-            Log.d("file_name",tempFile.getName());
-            if(tempFile.getName().contains(name)) {
-                arrays.add(tempFile.getName());
-            }
-        }
-        if(arrays.size() > 0) {
-            int randomPosition = new Random().nextInt(arrays.size());
-            String path = getCacheDir() + "/" + arrays.get(randomPosition);
-            Log.d("Path",path);
-            return path;
-        }
-        else return null;
-    }
-
-    public static Bitmap getBitmapFromAsset(Context context, String filename) {
-        AssetManager assetManager = context.getAssets();
-
-        InputStream istr;
-        Bitmap bitmap = null;
-        try {
-            istr = assetManager.open(filename);
-            bitmap = BitmapFactory.decodeStream(istr);
-        } catch (IOException e) {
-            // handle exception
-        }
-        return bitmap;
-    }
-
 
     public void saveBitmaptoJpeg(Bitmap bitmap, String name)
     {
@@ -305,6 +176,8 @@ public class MainActivity extends AppCompatActivity {
                         //사용자가 이미지를 선택함과 동시에 캐쉬에 비트맵을 저장한다 "pixtreetemp.jpeg"
                         saveBitmaptoJpeg(img,"pixtreetemp");
                         Log.e("Mytag","image saved");
+                        Intent intent = new Intent(MainActivity.this,ImageActivity.class);
+                        startActivity(intent);
                     }
                     catch (Exception e) {
                         Log.e("Mytag","image saved");
@@ -317,121 +190,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public String MyAsyncTask(){
-        TextView textview1 = (TextView) findViewById(R.id.textview1);
-        final OkHttpClient client = new OkHttpClient().newBuilder()
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .followRedirects(false)
-                .build();
-        final MediaType mediaType = MediaType.parse("text/plain");
-        final RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
-                .addFormDataPart("json", "jsonfile.json",
-                        RequestBody.create(MediaType.parse("application/json"),
-                                new File(Objects.requireNonNull(getBitmapPathFromCacheDir("jsonfile.json")))))
-                .addFormDataPart("image", "pixtreetemp.jpeg",
-                        RequestBody.create(MediaType.parse("image/jpeg"),
-                                new File(Objects.requireNonNull(getBitmapPathFromCacheDir("pixtreetemp.jpeg")))))
-                .build();
-        final Request request = new Request.Builder()
-                .url("http://photo.pixtree.com:34569/sr/start")
-                .method("POST", body)
-                .addHeader("Authorization", "Bearer supernova")
-                .build();
-        AsyncTask<Void, Void, String> asyncTask = new AsyncTask<Void, Void, String>() {
-
-            @SuppressLint("StaticFieldLeak")
-            @Override
-            protected String doInBackground(Void... params) {
-                try {
-                    Response response = client.newCall(request).execute();
-                    /*if (!response.isSuccessful()) {
-                        Log.e("mytag", "connection fail");
-                        return "network error";
-                    }*/
-                    return response.body().string();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-            @Override
-            protected void onPostExecute (String str){
-                super.onPostExecute(str);
-                TextView textview1 = (TextView) findViewById(R.id.textview1);
-
-                if (str != null) {
-                    textview1.setText(str);
-                    Log.e("response",str);
-                    Gson gson = new Gson();
-                    responsess respclass = gson.fromJson(str, responsess.class);
-                    //respclass.logall();
-                }
-            }
-        };
-        try {
-            String result = asyncTask.execute().get();
-            return result;
-        }
-        catch(Exception e){
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static class responsess {
-        private String description;
-        private String id;
-        private String link;
-        private int version;
-        private int waiting_number;
-        private int waiting_time;
-        private int result_code;
-        public void logall(){
-            Log.e("description",description);
-            Log.e("id",id);
-            Log.e("link",link);
-            Log.e("version",Integer.toString(version));
-            Log.e("waiting number",Integer.toString(waiting_number));
-            Log.e("waiting time",Integer.toString(waiting_time));
-            Log.e("result code",Integer.toString(result_code));
-        }
-        public String getDescription(){ return description; }
-        public String getId(){
-            return id;
-        }
-        public String getLink(){
-            return link;
-        }
-        public int getVersion(){
-            return version;
-        }
-        public int getWaiting_number(){
-            return waiting_number;
-        }
-        public int getWaiting_time(){
-            return waiting_time;
-        }
-        public int getResunt_code(){ return result_code; }
-        public void setDescription(){
-            this.description = description;
-        }
-        public void setId(){
-            this.id = id;
-        }
-        public void setLink(){
-            this.link = link;
-        }
-        public void setVersion(){
-            this.version = version;
-        }
-        public void setWaiting_number(){
-            this.waiting_number = waiting_number;
-        }
-        public void setWaiting_time(){
-            this.waiting_time = waiting_time;
-        }
-        public void setResult_code(){ this.result_code = result_code; }
-    }
 }
 
 

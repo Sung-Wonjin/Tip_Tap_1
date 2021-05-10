@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -28,7 +30,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -61,7 +65,7 @@ public class ImageActivity extends AppCompatActivity {
                 imageView1 = (ImageView) findViewById(R.id.image1);
                 String result = MyAsyncTask();
                 Gson gson = new Gson();
-                MainActivity.responsess resp = gson.fromJson(result, MainActivity.responsess.class);
+                responsess resp = gson.fromJson(result, responsess.class);
                 resp.logall();
                 JsonParser parser = new JsonParser();
                 JsonElement element = parser.parse(result);
@@ -93,6 +97,7 @@ public class ImageActivity extends AppCompatActivity {
 
 
 
+
         imageView1.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -117,6 +122,11 @@ public class ImageActivity extends AppCompatActivity {
 
     }
 
+    private String dateName(long dateTaken){
+        Date date = new Date(dateTaken);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss");
+        return dateFormat.format(date);
+    }
 
     private Bitmap getBitmapFromCacheDir(String name) {
 
@@ -189,6 +199,23 @@ public class ImageActivity extends AppCompatActivity {
         else return null;
     }
 
+    private void savePicture() {
+        String date = dateName(System.currentTimeMillis());
+
+        File dir = new File(Environment.getExternalStorageDirectory(), "Pictures/TipTap/" + date);
+        FileOutputStream fos;
+        try {
+            fos = new FileOutputStream(dir.toString() + ".jpg");
+            Toast.makeText(getApplicationContext(), "저장완료", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(getApplicationContext(), "저장실패", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+
+
     public String MyAsyncTask(){
         //TextView textview1 = (TextView) findViewById(R.id.textview1);
         final OkHttpClient client = new OkHttpClient().newBuilder()
@@ -216,10 +243,6 @@ public class ImageActivity extends AppCompatActivity {
             protected String doInBackground(Void... params) {
                 try {
                     Response response = client.newCall(request).execute();
-                    /*if (!response.isSuccessful()) {
-                        Log.e("mytag", "connection fail");
-                        return "network error";
-                    }*/
                     return response.body().string();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -229,14 +252,11 @@ public class ImageActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute (String str){
                 super.onPostExecute(str);
-                //TextView textview1 = (TextView) findViewById(R.id.textview1);
 
                 if (str != null) {
-                    //textview1.setText(str);
                     Log.e("response",str);
                     Gson gson = new Gson();
-                    MainActivity.responsess respclass = gson.fromJson(str, MainActivity.responsess.class);
-                    //respclass.logall();
+                    responsess respclass = gson.fromJson(str, responsess.class);
                 }
             }
         };
