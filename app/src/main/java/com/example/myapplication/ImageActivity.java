@@ -48,6 +48,7 @@ public class ImageActivity extends AppCompatActivity {
 
     ImageView imageView1;
     Button button1;
+    Button button2;
     String url;
 
     @Override
@@ -56,6 +57,7 @@ public class ImageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_image);
         imageView1 = (ImageView) findViewById(R.id.image1);
         button1 = (Button) findViewById(R.id.button1);
+        button2 = (Button) findViewById(R.id.button2);
         Bitmap bitmap = getBitmapFromCacheDir("pixtreetemp.jpeg");
         imageView1.setImageBitmap(bitmap);
 
@@ -96,8 +98,6 @@ public class ImageActivity extends AppCompatActivity {
         });
 
 
-
-
         imageView1.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -120,13 +120,19 @@ public class ImageActivity extends AppCompatActivity {
             }
         });
 
+        button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+            savePicture();
+            }
+        });
     }
 
-    /*private String dateName(long dateTaken){
+    private String dateName(long dateTaken){
         Date date = new Date(dateTaken);
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss");
         return dateFormat.format(date);
-    }*/
+    }
 
     private Bitmap getBitmapFromCacheDir(String name) {
 
@@ -199,20 +205,25 @@ public class ImageActivity extends AppCompatActivity {
         else return null;
     }
 
-   /* private void savePicture() {
+   private void savePicture() {
         String date = dateName(System.currentTimeMillis());
-
+        Bitmap bmp = getBitmapFromCacheDir("enhanced.jpeg");
         File dir = new File(Environment.getExternalStorageDirectory(), "Pictures/TipTap/" + date);
         FileOutputStream fos;
         try {
+            if(!dir.isDirectory()){
+                dir.mkdirs();
+            }
             fos = new FileOutputStream(dir.toString() + ".jpg");
+            bmp.compress(Bitmap.CompressFormat.JPEG,100,fos);
+            fos.close();
             Toast.makeText(getApplicationContext(), "저장완료", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(getApplicationContext(), "저장실패", Toast.LENGTH_SHORT).show();
         }
 
-    }*/
+    }
 
 
 
