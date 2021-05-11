@@ -4,10 +4,10 @@
         "protocol": "internal"
     },
     "output": {
-        "lossless": 0,
+        "lossless": 1,
         "compress": 0,
         "protocol": "link",
         "size": 1
     },
-    "sr_mode": 5
+    "sr_mode": 4
 }
