@@ -122,11 +122,11 @@ public class ImageActivity extends AppCompatActivity {
 
     }
 
-    private String dateName(long dateTaken){
+    /*private String dateName(long dateTaken){
         Date date = new Date(dateTaken);
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss");
         return dateFormat.format(date);
-    }
+    }*/
 
     private Bitmap getBitmapFromCacheDir(String name) {
 
@@ -199,7 +199,7 @@ public class ImageActivity extends AppCompatActivity {
         else return null;
     }
 
-    private void savePicture() {
+   /* private void savePicture() {
         String date = dateName(System.currentTimeMillis());
 
         File dir = new File(Environment.getExternalStorageDirectory(), "Pictures/TipTap/" + date);
@@ -212,7 +212,7 @@ public class ImageActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "저장실패", Toast.LENGTH_SHORT).show();
         }
 
-    }
+    }*/
 
 
 

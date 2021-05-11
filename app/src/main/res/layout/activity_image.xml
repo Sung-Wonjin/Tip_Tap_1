@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".ImageActivity">
 
 
     <RelativeLayout
@@ -33,6 +34,7 @@
             android:textSize="10sp" />
 
         <Button
+            android:id="@+id/button2"
             android:layout_width="100sp"
             android:layout_height="50sp"
             android:layout_toRightOf="@+id/button1"
@@ -40,7 +42,7 @@
             android:layout_marginTop="20sp"
             android:layout_marginLeft="10sp"
             android:text="이미지 저장"
-            android:textsize="10sp"/>
+            />
 
     </RelativeLayout>
 
