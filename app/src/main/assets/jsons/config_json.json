@@ -5,9 +5,9 @@
     },
     "output": {
         "lossless": 1,
-        "compress": 0,
+        "compress": 1,
         "protocol": "link",
-        "size": 1
+        "size": 2
     },
     "sr_mode": 4
 }

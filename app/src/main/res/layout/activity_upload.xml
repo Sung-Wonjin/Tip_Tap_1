@@ -8,9 +8,10 @@
 
     <TextView
         android:id="@+id/textView"
-        android:layout_width="197dp"
-        android:layout_height="65dp"
+        android:layout_width="130dp"
+        android:layout_height="38dp"
         android:text="잠시만 기다려주세요"
-        tools:layout_editor_absoluteX="124dp"
-        tools:layout_editor_absoluteY="333dp" />
+        tools:layout_editor_absoluteX="140dp"
+        tools:layout_editor_absoluteY="346dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
