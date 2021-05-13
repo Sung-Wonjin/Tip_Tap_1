@@ -25,14 +25,13 @@
         android:layout_marginBottom="20sp"
         android:background="#EAEAEA"
         android:text="갤러리에서 사진선택"
-        android:textSize="20sp"
         android:textColor="#000000"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.534"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView7"
-        app:layout_constraintVertical_bias="0.619"
+        app:layout_constraintVertical_bias="0.5"
         tools:ignore="MissingConstraints" />
 
     <ImageView
@@ -40,7 +39,6 @@
         android:layout_width="413sp"
         android:layout_height="510sp"
         android:layout_marginTop="10sp"
-        android:layout_marginBottom="30sp"
         app:layout_constraintBottom_toTopOf="@+id/button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.6"

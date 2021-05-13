@@ -26,6 +26,9 @@
         <activity android:name=".ImageActivity"
             android:parentActivityName=".MainActivity"
             />
+        <activity android:name=".UploadActivity"
+            android:parentActivityName=".ImageActivity"
+        />
 
     </application>
 </manifest>

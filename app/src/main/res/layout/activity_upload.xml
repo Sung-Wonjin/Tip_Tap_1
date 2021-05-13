@@ -12,6 +12,7 @@
         android:layout_height="38dp"
         android:text="잠시만 기다려주세요"
         tools:layout_editor_absoluteX="140dp"
-        tools:layout_editor_absoluteY="346dp" />
+        tools:layout_editor_absoluteY="346dp"
+        tools:ignore="MissingConstraints" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

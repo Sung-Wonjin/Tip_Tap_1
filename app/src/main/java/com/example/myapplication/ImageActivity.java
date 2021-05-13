@@ -2,6 +2,7 @@ package com.example.myapplication;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -76,6 +77,9 @@ public class ImageActivity extends AppCompatActivity {
                 url = element.getAsJsonObject().get("link").getAsString();
                 Log.d("url",url);
                 final int waitingtime = element.getAsJsonObject().get("waiting_time").getAsInt();
+                /*Intent uploading = new Intent(ImageActivity.this,UploadActivity.class);
+                uploading.putExtra("time", waitingtime);
+                startActivityForResult(uploading,1);*/
 
                 new Handler().postDelayed(new Runnable() {
                     @Override
@@ -225,7 +229,6 @@ public class ImageActivity extends AppCompatActivity {
             e.printStackTrace();
             Toast.makeText(getApplicationContext(), "저장실패", Toast.LENGTH_SHORT).show();
         }
-
     }
 
 
