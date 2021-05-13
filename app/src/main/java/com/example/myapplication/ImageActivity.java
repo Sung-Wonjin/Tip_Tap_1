@@ -50,6 +50,7 @@ public class ImageActivity extends AppCompatActivity {
     Button button1;
     Button button2;
     String url;
+    TextView textView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,6 +61,7 @@ public class ImageActivity extends AppCompatActivity {
         button2 = (Button) findViewById(R.id.button2);
         Bitmap bitmap = getBitmapFromCacheDir("pixtreetemp.jpeg");
         imageView1.setImageBitmap(bitmap);
+        textView = (TextView) findViewById(R.id.textview1);
 
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -209,11 +211,12 @@ public class ImageActivity extends AppCompatActivity {
         String date = dateName(System.currentTimeMillis());
         Bitmap bmp = getBitmapFromCacheDir("enhanced.jpeg");
         File dir = new File(Environment.getExternalStorageDirectory(), "Pictures/TipTap/" + date);
+        File isdir = new File(Environment.getExternalStorageDirectory(), "Pictures/TipTap");
+        if(!dir.isDirectory()){
+            isdir.mkdirs();
+        }
         FileOutputStream fos;
         try {
-            if(!dir.isDirectory()){
-                dir.mkdirs();
-            }
             fos = new FileOutputStream(dir.toString() + ".jpg");
             bmp.compress(Bitmap.CompressFormat.JPEG,100,fos);
             fos.close();
