@@ -216,7 +216,7 @@ public class ImageActivity extends AppCompatActivity {
         Bitmap bmp = getBitmapFromCacheDir("enhanced.jpeg");
         File dir = new File(Environment.getExternalStorageDirectory(), "Pictures/TipTap/" + date);
         File isdir = new File(Environment.getExternalStorageDirectory(), "Pictures/TipTap");
-        if(!dir.isDirectory()){
+        if(!isdir.isDirectory()){
             isdir.mkdirs();
         }
         FileOutputStream fos;
