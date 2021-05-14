@@ -81,18 +81,20 @@ public class MainActivity extends AppCompatActivity {
 
     private void JsonToFile(){
         File jsonfile = new File(getCacheDir(),"jsonfile.json");
-        String json = null;
-        try {
-            InputStream is = getAssets().open("jsons/config_json.json");
-            OutputStream os = new FileOutputStream(jsonfile);
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            os.write(buffer);
-            is.close();
-            os.close();
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        if(!jsonfile.isFile()) {
+            String json = null;
+            try {
+                InputStream is = getAssets().open("jsons/config_json.json");
+                OutputStream os = new FileOutputStream(jsonfile);
+                int size = is.available();
+                byte[] buffer = new byte[size];
+                is.read(buffer);
+                os.write(buffer);
+                is.close();
+                os.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 

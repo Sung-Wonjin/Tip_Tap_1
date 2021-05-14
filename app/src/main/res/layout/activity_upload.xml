@@ -10,9 +10,12 @@
         android:id="@+id/textView"
         android:layout_width="130dp"
         android:layout_height="38dp"
+        android:layout_marginTop="100dp"
         android:text="잠시만 기다려주세요"
-        tools:layout_editor_absoluteX="140dp"
-        tools:layout_editor_absoluteY="346dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintVertical_bias="0.5"
         tools:ignore="MissingConstraints" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

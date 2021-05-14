@@ -1,8 +1,10 @@
 package com.example.myapplication;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -20,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -50,6 +53,7 @@ public class ImageActivity extends AppCompatActivity {
     ImageView imageView1;
     Button button1;
     Button button2;
+    Button button3;
     String url;
     TextView textView;
 
@@ -60,6 +64,7 @@ public class ImageActivity extends AppCompatActivity {
         imageView1 = (ImageView) findViewById(R.id.image1);
         button1 = (Button) findViewById(R.id.button1);
         button2 = (Button) findViewById(R.id.button2);
+        button3 = (Button) findViewById(R.id.button3);
         Bitmap bitmap = getBitmapFromCacheDir("pixtreetemp.jpeg");
         imageView1.setImageBitmap(bitmap);
         textView = (TextView) findViewById(R.id.textview1);
@@ -77,9 +82,9 @@ public class ImageActivity extends AppCompatActivity {
                 url = element.getAsJsonObject().get("link").getAsString();
                 Log.d("url",url);
                 final int waitingtime = element.getAsJsonObject().get("waiting_time").getAsInt();
-                /*Intent uploading = new Intent(ImageActivity.this,UploadActivity.class);
+                Intent uploading = new Intent(ImageActivity.this,UploadActivity.class);
                 uploading.putExtra("time", waitingtime);
-                startActivityForResult(uploading,1);*/
+                startActivityForResult(uploading,1);
 
                 new Handler().postDelayed(new Runnable() {
                     @Override
@@ -129,6 +134,7 @@ public class ImageActivity extends AppCompatActivity {
         button2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+            CheckPermission();
             savePicture();
             }
         });
@@ -138,6 +144,24 @@ public class ImageActivity extends AppCompatActivity {
         Date date = new Date(dateTaken);
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss");
         return dateFormat.format(date);
+    }
+
+    public void CheckPermission() {
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+            if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.INTERNET)){
+                Toast.makeText(this,"정상적인 앱 실행을 위해서는 권한을 설정해야합니다",Toast.LENGTH_LONG).show();
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.INTERNET, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        1);
+            }
+            else{
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.INTERNET, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        1);
+            }
+        }
     }
 
     private Bitmap getBitmapFromCacheDir(String name) {
