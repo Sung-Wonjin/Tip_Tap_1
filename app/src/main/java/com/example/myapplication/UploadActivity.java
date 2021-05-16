@@ -24,8 +24,8 @@ public class UploadActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent intent = new Intent(UploadActivity.this,ImageActivity.class);
-                startActivity(intent);
+                //Intent intent = new Intent(UploadActivity.this,ImageActivity.class);
+                //startActivity(intent);
                 finish();
             }
         },key*990);

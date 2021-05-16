@@ -111,9 +111,9 @@ public class ImageActivity extends AppCompatActivity {
                     }
                 },waitingtime*1100);
 
-                /*Intent uploading = new Intent(ImageActivity.this,UploadActivity.class);
+                Intent uploading = new Intent(ImageActivity.this,UploadActivity.class);
                 uploading.putExtra("time", waitingtime);
-                startActivityForResult(uploading,1);*/
+                startActivityForResult(uploading,1);
             }
         });
 
