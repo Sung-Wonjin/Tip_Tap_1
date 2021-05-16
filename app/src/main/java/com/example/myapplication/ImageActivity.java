@@ -9,10 +9,12 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -54,6 +56,7 @@ public class ImageActivity extends AppCompatActivity {
     Button button1;
     Button button2;
     Button button3;
+    Button button4;
     String url;
     TextView textView;
 
@@ -65,6 +68,7 @@ public class ImageActivity extends AppCompatActivity {
         button1 = (Button) findViewById(R.id.button1);
         button2 = (Button) findViewById(R.id.button2);
         button3 = (Button) findViewById(R.id.button3);
+        button4 = (Button) findViewById(R.id.button4);
         Bitmap bitmap = getBitmapFromCacheDir("pixtreetemp.jpeg");
         imageView1.setImageBitmap(bitmap);
         textView = (TextView) findViewById(R.id.textview1);
@@ -82,9 +86,6 @@ public class ImageActivity extends AppCompatActivity {
                 url = element.getAsJsonObject().get("link").getAsString();
                 Log.d("url",url);
                 final int waitingtime = element.getAsJsonObject().get("waiting_time").getAsInt();
-                Intent uploading = new Intent(ImageActivity.this,UploadActivity.class);
-                uploading.putExtra("time", waitingtime);
-                startActivityForResult(uploading,1);
 
                 new Handler().postDelayed(new Runnable() {
                     @Override
@@ -94,17 +95,25 @@ public class ImageActivity extends AppCompatActivity {
                                 .load(url)
                                 .into(imageView1);
                     }
-                },waitingtime*1000);
+                },waitingtime*1050);
 
 
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        BitmapDrawable temp = (BitmapDrawable) imageView1.getDrawable();
-                        Bitmap bitmap = temp.getBitmap();
-                        saveBitmaptoJpeg(bitmap,"enhanced");
+                            try {
+                                BitmapDrawable temp = (BitmapDrawable) imageView1.getDrawable();
+                                Bitmap bitmap = temp.getBitmap();
+                                saveBitmaptoJpeg(bitmap, "enhanced");
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                     }
-                },waitingtime*1050);
+                },waitingtime*1100);
+
+                /*Intent uploading = new Intent(ImageActivity.this,UploadActivity.class);
+                uploading.putExtra("time", waitingtime);
+                startActivityForResult(uploading,1);*/
             }
         });
 
@@ -138,6 +147,16 @@ public class ImageActivity extends AppCompatActivity {
             savePicture();
             }
         });
+
+        button4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+            Intent intent = new Intent(ImageActivity.this,ComparePhoto.class);
+            //String path = getBitmapPathFromCacheDir("enhanced");
+            //intent.putExtra("drawable", path);
+            startActivity(intent);
+            }
+        });
     }
 
     private String dateName(long dateTaken){
@@ -164,7 +183,7 @@ public class ImageActivity extends AppCompatActivity {
         }
     }
 
-    private Bitmap getBitmapFromCacheDir(String name) {
+    public Bitmap getBitmapFromCacheDir(String name) {
 
         ArrayList<String> arrays = new ArrayList<>();
 

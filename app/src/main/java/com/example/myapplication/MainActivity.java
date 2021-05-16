@@ -48,8 +48,6 @@ public class MainActivity extends AppCompatActivity {
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(intent, 1);
-
-
             }
         });//listener of the butten for the image call
 
@@ -81,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void JsonToFile(){
         File jsonfile = new File(getCacheDir(),"jsonfile.json");
-        if(!jsonfile.isFile()) {
+        //if(!jsonfile.isFile()) {
             String json = null;
             try {
                 InputStream is = getAssets().open("jsons/config_json.json");
@@ -95,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-        }
+        //}
     }
 
     public void saveBitmaptoJpeg(Bitmap bitmap, String name) {

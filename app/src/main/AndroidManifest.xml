@@ -29,6 +29,8 @@
         <activity android:name=".UploadActivity"
             android:parentActivityName=".ImageActivity"
         />
+        <activity android:name=".ComparePhoto"
+            android:parentActivityName=".ImageActivity" />
 
     </application>
 </manifest>

@@ -28,7 +28,7 @@ public class UploadActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             }
-        },key*950);
+        },key*990);
 
     }
 }
