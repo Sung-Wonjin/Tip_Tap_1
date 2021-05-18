@@ -1,29 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:background="#ffffff">
+    android:background="#ffffff"
+    tools:context=".MainActivity">
 
-    <ImageView
-        android:id="@+id/imageView6"
-        android:layout_width="240sp"
-        android:layout_height="60sp"
-        android:layout_marginTop="10sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/logo" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_1"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="#efefef"
+        tools:ignore="MissingConstraints">
+
+        <ImageView
+            android:id="@+id/imageView6"
+            android:layout_width="240sp"
+            android:layout_height="60sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/logo" />
+
+        <Button
+            android:id="@+id/button1"
+            android:layout_width="35sp"
+            android:layout_height="35sp"
+            android:layout_marginStart="4sp"
+            android:layout_marginEnd="10sp"
+            android:background="@drawable/icon1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.527"
+            app:layout_constraintStart_toEndOf="@+id/imageView6"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <Button
         android:id="@+id/button"
         android:layout_width="267sp"
         android:layout_height="65sp"
-        android:layout_marginBottom="20sp"
-        android:background="#EAEAEA"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="#dfdfdf"
+        android:shadowColor="#ffffff"
         android:text="갤러리에서 사진선택"
         android:textColor="#000000"
         android:textSize="20sp"
@@ -31,33 +54,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView7"
-        app:layout_constraintVertical_bias="0.5"
+        app:layout_constraintVertical_bias="0.147"
         tools:ignore="MissingConstraints" />
 
     <ImageView
         android:id="@+id/imageView7"
         android:layout_width="413sp"
         android:layout_height="510sp"
-        android:layout_marginTop="10sp"
-        app:layout_constraintBottom_toTopOf="@+id/button"
+        android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.6"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView6"
+        app:layout_constraintTop_toBottomOf="@+id/layout_1"
         app:srcCompat="@drawable/main" />
 
-    <Button
-        android:id="@+id/button1"
-        android:layout_width="35sp"
-        android:layout_height="35sp"
-        android:layout_marginStart="4sp"
-        android:layout_marginEnd="10sp"
-        android:layout_marginBottom="10sp"
-        android:background="@drawable/icon1"
-        app:layout_constraintBottom_toTopOf="@+id/imageView7"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.675"
-        app:layout_constraintStart_toEndOf="@+id/imageView6"
-        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -53,69 +53,30 @@ import okhttp3.Response;
 public class ImageActivity extends AppCompatActivity {
 
     ImageView imageView1;
-    Button button1;
     Button button2;
     Button button3;
     Button button4;
     String url;
     TextView textView;
+    boolean processing;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image);
         imageView1 = (ImageView) findViewById(R.id.image1);
-        button1 = (Button) findViewById(R.id.button1);
         button2 = (Button) findViewById(R.id.button2);
         button3 = (Button) findViewById(R.id.button3);
         button4 = (Button) findViewById(R.id.button4);
         Bitmap bitmap = getBitmapFromCacheDir("pixtreetemp.jpeg");
         imageView1.setImageBitmap(bitmap);
         textView = (TextView) findViewById(R.id.textview1);
+        processing = false;
+        Intent intent = getIntent();
+        int waitingtime = intent.getExtras().getInt("time");
+        url = intent.getExtras().getString("url");
+        LoadImage();
 
-        button1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                imageView1 = (ImageView) findViewById(R.id.image1);
-                String result = MyAsyncTask();
-                Gson gson = new Gson();
-                responsess resp = gson.fromJson(result, responsess.class);
-                resp.logall();
-                JsonParser parser = new JsonParser();
-                JsonElement element = parser.parse(result);
-                url = element.getAsJsonObject().get("link").getAsString();
-                Log.d("url",url);
-                final int waitingtime = element.getAsJsonObject().get("waiting_time").getAsInt();
-
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        Picasso
-                                .get()
-                                .load(url)
-                                .into(imageView1);
-                    }
-                },waitingtime*1050);
-
-
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                            try {
-                                BitmapDrawable temp = (BitmapDrawable) imageView1.getDrawable();
-                                Bitmap bitmap = temp.getBitmap();
-                                saveBitmaptoJpeg(bitmap, "enhanced");
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                    }
-                },waitingtime*1100);
-
-                Intent uploading = new Intent(ImageActivity.this,UploadActivity.class);
-                uploading.putExtra("time", waitingtime);
-                startActivityForResult(uploading,1);
-            }
-        });
 
 
         imageView1.setOnTouchListener(new View.OnTouchListener() {
@@ -148,6 +109,14 @@ public class ImageActivity extends AppCompatActivity {
             }
         });
 
+        button3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //Intent intent = new Intent(ImageActivity.this,Preference.class);
+                //startActivity(intent);
+            }
+        });
+
         button4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -157,6 +126,54 @@ public class ImageActivity extends AppCompatActivity {
             startActivity(intent);
             }
         });
+    }
+
+    public void LoadImage(){
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Picasso
+                        .get()
+                        .load(url)
+                        .into(imageView1);
+            }
+        }, 1200);
+
+        if(imageView1 != null) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        BitmapDrawable temp = (BitmapDrawable) imageView1.getDrawable();
+                        Bitmap bitmap = temp.getBitmap();
+                        saveBitmaptoJpeg(bitmap, "enhanced");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    processing = false;
+                }
+            }, 1500);
+        }
+        else reload();
+    }
+
+    public void reload(){
+        if(imageView1 != null) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        BitmapDrawable temp = (BitmapDrawable) imageView1.getDrawable();
+                        Bitmap bitmap = temp.getBitmap();
+                        saveBitmaptoJpeg(bitmap, "enhanced");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    processing = false;
+                }
+            }, 500);
+        }
+        else reload();
     }
 
     private String dateName(long dateTaken){
@@ -190,7 +207,7 @@ public class ImageActivity extends AppCompatActivity {
         File file = new File(getCacheDir().toString());
         File[] files = file.listFiles();
         for(File tempFile : files) {
-            Log.d("MyTag",tempFile.getName());
+            Log.d("File_List",tempFile.getName());
             if(tempFile.getName().contains(name)) {
                 arrays.add(tempFile.getName());
             }
@@ -234,26 +251,6 @@ public class ImageActivity extends AppCompatActivity {
         }
     }
 
-    private String getBitmapPathFromCacheDir(String name){
-        ArrayList<String> arrays = new ArrayList<>();
-
-        File file = new File(getCacheDir().toString());
-        File[] files = file.listFiles();
-        for(File tempFile : Objects.requireNonNull(files)) {
-            Log.d("file_name",tempFile.getName());
-            if(tempFile.getName().contains(name)) {
-                arrays.add(tempFile.getName());
-            }
-        }
-        if(arrays.size() > 0) {
-            int randomPosition = new Random().nextInt(arrays.size());
-            String path = getCacheDir() + "/" + arrays.get(randomPosition);
-            Log.d("Path",path);
-            return path;
-        }
-        else return null;
-    }
-
    private void savePicture() {
         String date = dateName(System.currentTimeMillis());
         Bitmap bmp = getBitmapFromCacheDir("enhanced.jpeg");
@@ -274,115 +271,5 @@ public class ImageActivity extends AppCompatActivity {
         }
     }
 
-
-
-    public String MyAsyncTask(){
-        //TextView textview1 = (TextView) findViewById(R.id.textview1);
-        final OkHttpClient client = new OkHttpClient().newBuilder()
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .followRedirects(false)
-                .build();
-        final MediaType mediaType = MediaType.parse("text/plain");
-        final RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
-                .addFormDataPart("json", "jsonfile.json",
-                        RequestBody.create(MediaType.parse("application/json"),
-                                new File(Objects.requireNonNull(getBitmapPathFromCacheDir("jsonfile.json")))))
-                .addFormDataPart("image", "pixtreetemp.jpeg",
-                        RequestBody.create(MediaType.parse("image/jpeg"),
-                                new File(Objects.requireNonNull(getBitmapPathFromCacheDir("pixtreetemp.jpeg")))))
-                .build();
-        final Request request = new Request.Builder()
-                .url("http://photo.pixtree.com:34569/sr/start")
-                .method("POST", body)
-                .addHeader("Authorization", "Bearer supernova")
-                .build();
-        AsyncTask<Void, Void, String> asyncTask = new AsyncTask<Void, Void, String>() {
-
-            @SuppressLint("StaticFieldLeak")
-            @Override
-            protected String doInBackground(Void... params) {
-                try {
-                    Response response = client.newCall(request).execute();
-                    return response.body().string();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-            @Override
-            protected void onPostExecute (String str){
-                super.onPostExecute(str);
-
-                if (str != null) {
-                    Log.e("response",str);
-                    Gson gson = new Gson();
-                    responsess respclass = gson.fromJson(str, responsess.class);
-                }
-            }
-        };
-        try {
-            String result = asyncTask.execute().get();
-            return result;
-        }
-        catch(Exception e){
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static class responsess {
-        private String description;
-        private String id;
-        private String link;
-        private int version;
-        private int waiting_number;
-        private int waiting_time;
-        private int result_code;
-        public void logall(){
-            Log.e("description",description);
-            Log.e("id",id);
-            Log.e("link",link);
-            Log.e("version",Integer.toString(version));
-            Log.e("waiting number",Integer.toString(waiting_number));
-            Log.e("waiting time",Integer.toString(waiting_time));
-            Log.e("result code",Integer.toString(result_code));
-        }
-        public String getDescription(){ return description; }
-        public String getId(){
-            return id;
-        }
-        public String getLink(){
-            return link;
-        }
-        public int getVersion(){
-            return version;
-        }
-        public int getWaiting_number(){
-            return waiting_number;
-        }
-        public int getWaiting_time(){
-            return waiting_time;
-        }
-        public int getResunt_code(){ return result_code; }
-        public void setDescription(){
-            this.description = description;
-        }
-        public void setId(){
-            this.id = id;
-        }
-        public void setLink(){
-            this.link = link;
-        }
-        public void setVersion(){
-            this.version = version;
-        }
-        public void setWaiting_number(){
-            this.waiting_number = waiting_number;
-        }
-        public void setWaiting_time(){
-            this.waiting_time = waiting_time;
-        }
-        public void setResult_code(){ this.result_code = result_code; }
-    }
 
 }

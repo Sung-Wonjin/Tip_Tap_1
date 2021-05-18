@@ -140,11 +140,11 @@ public class MainActivity extends AppCompatActivity {
                         //사용자가 이미지를 선택함과 동시에 캐쉬에 비트맵을 저장한다 "pixtreetemp.jpeg"
                         saveBitmaptoJpeg(img,"pixtreetemp");
                         Log.e("Mytag","image saved");
-                        Intent intent = new Intent(MainActivity.this,ImageActivity.class);
+                        Intent intent = new Intent(MainActivity.this,ImageSelect.class);
                         startActivity(intent);
                     }
                     catch (Exception e) {
-                        Log.e("Mytag","image saved");
+                        Log.e("Mytag","image save fail");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
