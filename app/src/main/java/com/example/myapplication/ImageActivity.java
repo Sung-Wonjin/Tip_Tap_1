@@ -137,39 +137,39 @@ public class ImageActivity extends AppCompatActivity {
                         .load(url)
                         .into(imageView1);
             }
-        }, 1200);
+        }, 1000);
 
-        if(imageView1 != null) {
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        BitmapDrawable temp = (BitmapDrawable) imageView1.getDrawable();
-                        Bitmap bitmap = temp.getBitmap();
-                        saveBitmaptoJpeg(bitmap, "enhanced");
-                    } catch (Exception e) {
-                        e.printStackTrace();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    BitmapDrawable temp = (BitmapDrawable) imageView1.getDrawable();
+                    Bitmap bitmap = temp.getBitmap();
+                    if(bitmap == null){
+                        reload();
                     }
-                    processing = false;
+                    saveBitmaptoJpeg(bitmap, "enhanced");
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            }, 1500);
-        }
-        else reload();
+                processing = false;
+            }
+        }, 2000);
+
     }
 
     public void reload(){
-        if(imageView1 != null) {
+        BitmapDrawable temp = (BitmapDrawable) imageView1.getDrawable();
+        final Bitmap bitmap = temp.getBitmap();
+        if(bitmap != null) {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        BitmapDrawable temp = (BitmapDrawable) imageView1.getDrawable();
-                        Bitmap bitmap = temp.getBitmap();
                         saveBitmaptoJpeg(bitmap, "enhanced");
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    processing = false;
                 }
             }, 500);
         }
